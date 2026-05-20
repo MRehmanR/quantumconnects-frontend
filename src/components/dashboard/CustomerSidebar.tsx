@@ -1,37 +1,62 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Phone, BookOpen, Calendar, CreditCard,
-  Settings, LogOut, Zap, ChevronLeft, ChevronRight, Bell
+  LayoutDashboard, Bot, Phone, Calendar, BarChart3,
+  Settings, CircleHelp, LogOut, Zap, ChevronLeft, ChevronRight
 } from "lucide-react";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
-  { icon: Phone, label: "Call Logs", href: "/dashboard/calls" },
-  { icon: Calendar, label: "Appointments", href: "/dashboard/appointments" },
-  { icon: BookOpen, label: "Knowledge Base", href: "/dashboard/knowledge-base" },
-  { icon: CreditCard, label: "Billing", href: "/dashboard/billing" },
+  { icon: Bot, label: "My AI Receptionist", href: "/dashboard/knowledge-base" },
+  { icon: Phone, label: "Calls & Recordings", href: "/dashboard/calls" },
+  { icon: Calendar, label: "Bookings", href: "/dashboard/appointments" },
+  { icon: BarChart3, label: "Performance", href: "/dashboard" },
   { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+  { icon: CircleHelp, label: "Get Help", href: "mailto:hello@quantumconnects.com", external: true },
 ];
 
 interface CustomerSidebarProps {
   collapsed: boolean;
   onToggle: () => void;
+  className?: string;
+  hideCollapseToggle?: boolean;
+  onNavigate?: () => void;
 }
 
-export default function CustomerSidebar({ collapsed, onToggle }: CustomerSidebarProps) {
+export default function CustomerSidebar({ collapsed, onToggle, className, hideCollapseToggle = false, onNavigate }: CustomerSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    localStorage.removeItem("qc_auth_token");
+    localStorage.removeItem("qc_user_role");
+    localStorage.removeItem("qc_user_email");
+    localStorage.removeItem("qc_referral_code");
+    localStorage.removeItem("qc_inbound_number");
+    localStorage.removeItem("qc_user_name");
+    localStorage.removeItem("qc_business_name");
+    localStorage.removeItem("qc_owner_phone");
+    localStorage.removeItem("qc_user_timezone");
+    localStorage.removeItem("qc_retell_agent_id");
+    localStorage.removeItem("qc_provisioning_status");
+    navigate("/login");
+  };
+
+  const callsLimit = Number(localStorage.getItem("qc_calls_limit") || "150");
+  const callsUsed = Number(localStorage.getItem("qc_calls_used") || "0");
+  const trialTotalDays = 7;
+  const trialUsedDays = Math.min(Math.floor(callsUsed / Math.max(callsLimit / trialTotalDays, 1)), trialTotalDays);
+  const trialDaysLeft = Math.max(trialTotalDays - trialUsedDays, 0);
+  const trialProgress = Math.min(Math.round((trialUsedDays / trialTotalDays) * 100), 100);
 
   return (
     <aside
       className={cn(
         "fixed left-0 top-0 h-full z-40 flex flex-col border-r border-border bg-card transition-all duration-200",
-        collapsed ? "w-16" : "w-60"
+        collapsed ? "w-16" : "w-72",
+        className
       )}
     >
-      {/* Logo */}
       <div className={cn("flex h-16 items-center border-b border-border px-4", collapsed ? "justify-center" : "gap-2")}>
         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-primary">
           <Zap className="h-4 w-4 text-primary-foreground" />
@@ -43,20 +68,33 @@ export default function CustomerSidebar({ collapsed, onToggle }: CustomerSidebar
         )}
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
-          const active = location.pathname === item.href;
+          const active = !item.external && location.pathname === item.href;
+          const commonClasses = cn("sidebar-item", collapsed ? "justify-center px-2" : "", active && "active");
+
+          if (item.external) {
+            return (
+              <a
+                key={item.label}
+                href={item.href}
+                title={collapsed ? item.label : undefined}
+                className={commonClasses}
+                onClick={onNavigate}
+              >
+                <item.icon className="h-4 w-4 flex-shrink-0" />
+                {!collapsed && <span className="truncate">{item.label}</span>}
+              </a>
+            );
+          }
+
           return (
             <Link
               key={item.label}
               to={item.href}
+              onClick={onNavigate}
               title={collapsed ? item.label : undefined}
-              className={cn(
-                "sidebar-item",
-                collapsed ? "justify-center px-2" : "",
-                active && "active"
-              )}
+              className={commonClasses}
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
               {!collapsed && <span className="truncate">{item.label}</span>}
@@ -65,34 +103,47 @@ export default function CustomerSidebar({ collapsed, onToggle }: CustomerSidebar
         })}
       </nav>
 
-      {/* Bottom */}
+      {!collapsed && (
+        <div className="px-3 pb-3">
+          <div className="rounded-xl border border-border bg-muted/30 p-3 space-y-2">
+            <div className="flex items-center justify-between text-sm font-semibold text-amber-500">
+              <span>7-day free trial</span>
+              <span>{trialDaysLeft} days left</span>
+            </div>
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div className="h-full rounded-full bg-amber-400" style={{ width: `${trialProgress}%` }} />
+            </div>
+            <Link
+              to="/dashboard/billing"
+              className="flex w-full items-center justify-center rounded-lg bg-primary py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              Choose a Plan
+            </Link>
+          </div>
+        </div>
+      )}
+
       <div className="border-t border-border p-2 space-y-1">
         <button
-          onClick={() => navigate("/")}
+          onClick={handleSignOut}
           className={cn("sidebar-item w-full", collapsed ? "justify-center px-2" : "")}
-          title={collapsed ? "Sign Out" : undefined}
+          title={collapsed ? "Sign out" : undefined}
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
-          {!collapsed && <span>Sign Out</span>}
+          {!collapsed && <span>Sign out</span>}
         </button>
 
-        {/* Collapse toggle */}
-        <button
-          onClick={onToggle}
-          className={cn(
-            "w-full flex items-center rounded-md p-2 text-xs text-muted-foreground hover:bg-muted transition-colors",
-            collapsed ? "justify-center" : "gap-2"
-          )}
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <>
-              <ChevronLeft className="h-4 w-4" />
-              <span>Collapse</span>
-            </>
-          )}
-        </button>
+        {!hideCollapseToggle && (
+          <button
+            onClick={onToggle}
+            className={cn(
+              "w-full flex items-center rounded-md p-2 text-xs text-muted-foreground hover:bg-muted transition-colors",
+              collapsed ? "justify-center" : "gap-2"
+            )}
+          >
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <><ChevronLeft className="h-4 w-4" /><span>Collapse</span></>}
+          </button>
+        )}
       </div>
     </aside>
   );

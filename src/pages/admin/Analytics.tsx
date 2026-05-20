@@ -1,18 +1,24 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AdminShell from "@/components/dashboard/AdminShell";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
-
-const callData = [
-  { month: "Oct", calls: 58200 }, { month: "Nov", calls: 64100 }, { month: "Dec", calls: 71300 },
-  { month: "Jan", calls: 76800 }, { month: "Feb", calls: 83400 }, { month: "Mar", calls: 94731 },
-];
-const sentimentData = [
-  { name: "Positive", value: 68, color: "hsl(160 84% 39%)" },
-  { name: "Neutral", value: 24, color: "hsl(239 84% 67%)" },
-  { name: "Negative", value: 8, color: "hsl(0 84% 60%)" },
-];
+import { adminApi, type AdminAnalyticsData } from "@/lib/api";
 
 export default function AdminAnalytics() {
+  const [analytics, setAnalytics] = useState<AdminAnalyticsData | null>(null);
+
+  useEffect(() => {
+    const run = async () => {
+      const data = await adminApi.getAnalytics();
+      setAnalytics(data);
+    };
+
+    run();
+  }, []);
+
+  const callData = analytics?.callData || [];
+  const sentimentData = analytics?.sentimentData || [];
+
   return (
     <AdminShell>
       <div className="max-w-7xl mx-auto space-y-6">

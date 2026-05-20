@@ -1,22 +1,32 @@
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Users, CreditCard, DollarSign, Phone, TrendingUp } from "lucide-react";
 import AdminShell from "@/components/dashboard/AdminShell";
-import { mockData } from "@/lib/api";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
-
-const metrics = [
-  { label: "Total Users", value: mockData.adminOverview.totalUsers.toLocaleString(), icon: Users, delta: `+${mockData.adminOverview.growth.users}%`, iconBg: "bg-primary/10", iconColor: "text-primary" },
-  { label: "Active Subscriptions", value: mockData.adminOverview.activeSubscriptions.toLocaleString(), icon: CreditCard, delta: "+5.2%", iconBg: "bg-accent/10", iconColor: "text-accent" },
-  { label: "Monthly Revenue", value: `$${mockData.adminOverview.monthlyRevenue.toLocaleString()}`, icon: DollarSign, delta: `+${mockData.adminOverview.growth.revenue}%`, iconBg: "bg-yellow-500/10", iconColor: "text-yellow-600" },
-  { label: "Total Calls", value: mockData.adminOverview.totalCalls.toLocaleString(), icon: Phone, delta: `+${mockData.adminOverview.growth.calls}%`, iconBg: "bg-primary/10", iconColor: "text-primary" },
-];
-
-const revenueData = [
-  { month: "Oct", revenue: 31200 }, { month: "Nov", revenue: 34800 }, { month: "Dec", revenue: 38100 },
-  { month: "Jan", revenue: 41500 }, { month: "Feb", revenue: 44200 }, { month: "Mar", revenue: 48920 },
-];
+import { adminApi, type AdminOverviewData } from "@/lib/api";
+import { CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, XAxis, YAxis } from "recharts";
 
 export default function AdminOverview() {
+  const [overview, setOverview] = useState<AdminOverviewData | null>(null);
+
+  useEffect(() => {
+    const run = async () => {
+      const data = await adminApi.getOverview();
+      setOverview(data);
+    };
+
+    run();
+  }, []);
+
+  const metrics = useMemo(
+    () => [
+      { label: "Total Users", value: (overview?.totalUsers || 0).toLocaleString(), icon: Users, delta: `+${overview?.growth.users || 0}%`, iconBg: "bg-primary/10", iconColor: "text-primary" },
+      { label: "Active Subscriptions", value: (overview?.activeSubscriptions || 0).toLocaleString(), icon: CreditCard, delta: "+5.2%", iconBg: "bg-accent/10", iconColor: "text-accent" },
+      { label: "Monthly Revenue", value: `$${(overview?.monthlyRevenue || 0).toLocaleString()}`, icon: DollarSign, delta: `+${overview?.growth.revenue || 0}%`, iconBg: "bg-yellow-500/10", iconColor: "text-yellow-600" },
+      { label: "Total Calls", value: (overview?.totalCalls || 0).toLocaleString(), icon: Phone, delta: `+${overview?.growth.calls || 0}%`, iconBg: "bg-primary/10", iconColor: "text-primary" },
+    ],
+    [overview]
+  );
+
   return (
     <AdminShell>
       <div className="max-w-7xl mx-auto space-y-6">
@@ -38,7 +48,7 @@ export default function AdminOverview() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="card-surface p-5">
           <h3 className="text-sm font-semibold text-foreground mb-4">Monthly Revenue Trend</h3>
           <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={revenueData}>
+            <LineChart data={overview?.revenueData || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(214 32% 91%)" />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />

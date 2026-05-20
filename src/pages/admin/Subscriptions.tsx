@@ -1,25 +1,31 @@
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import AdminShell from "@/components/dashboard/AdminShell";
-import { mockData } from "@/lib/api";
-
-const plans = [
-  { name: "Trial", count: 284, revenue: 0, color: "bg-muted" },
-  { name: "Starter", count: 412, revenue: 11948, color: "bg-primary/40" },
-  { name: "Core", count: 356, revenue: 28124, color: "bg-primary/70" },
-  { name: "Pro", count: 188, revenue: 28012, color: "bg-primary" },
-  { name: "Scale", count: 64, revenue: 19136, color: "bg-primary-glow" },
-];
+import { adminApi, type AdminSubscriptionsData } from "@/lib/api";
 
 export default function AdminSubscriptions() {
-  const total = plans.reduce((a, p) => a + p.count, 0);
+  const [subscriptions, setSubscriptions] = useState<AdminSubscriptionsData | null>(null);
+
+  useEffect(() => {
+    const run = async () => {
+      const data = await adminApi.getSubscriptions();
+      setSubscriptions(data);
+    };
+
+    run();
+  }, []);
+
+  const plans = subscriptions?.plans || [];
+  const total = useMemo(() => plans.reduce((a, p) => a + p.count, 0), [plans]);
+
   return (
     <AdminShell>
       <div className="max-w-5xl mx-auto space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { label: "Total Subscribers", value: mockData.adminOverview.activeSubscriptions.toLocaleString() },
-            { label: "Monthly Recurring Revenue", value: `$${mockData.adminOverview.monthlyRevenue.toLocaleString()}` },
-            { label: "Avg Revenue / User", value: "$40.63" },
+            { label: "Total Subscribers", value: (subscriptions?.summary.totalSubscribers || 0).toLocaleString() },
+            { label: "Monthly Recurring Revenue", value: `$${(subscriptions?.summary.monthlyRevenue || 0).toLocaleString()}` },
+            { label: "Avg Revenue / User", value: `$${(subscriptions?.summary.avgRevenuePerUser || 0).toFixed(2)}` },
           ].map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="card-surface p-5">
               <div className="text-2xl font-bold text-foreground">{s.value}</div>

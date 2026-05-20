@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Zap, Eye, EyeOff, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,16 +8,37 @@ import { Label } from "@/components/ui/label";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const countryOptions = [
+    { code: "US", label: "United States (US)" },
+    { code: "CA", label: "Canada (CA)" },
+    { code: "GB", label: "United Kingdom (GB)" },
+    { code: "AU", label: "Australia (AU)" },
+    { code: "PK", label: "Pakistan (PK)" },
+    { code: "AE", label: "United Arab Emirates (AE)" },
+    { code: "DE", label: "Germany (DE)" },
+    { code: "FR", label: "France (FR)" },
+  ];
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     businessName: "",
-    phone: "",
+    country: "US",
+    websiteUrl: "",
+    referralCode: "",
   });
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) {
+      setForm((prev) => ({ ...prev, referralCode: ref }));
+    }
+  }, [searchParams]);
 
   const update = (field: string, value: string) => setForm({ ...form, [field]: value });
 
@@ -25,18 +46,149 @@ export default function Signup() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setLoadingStep("Creating account...");
+    localStorage.removeItem("qc_inbound_number");
     try {
       // POST /api/auth/signup
-      await fetch("/api/auth/signup", {
+      const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          username: form.name,
+          email: form.email,
+          password: form.password,
+          businessName: form.businessName,
+          referralCode: form.referralCode,
+          referralMethod: searchParams.get("ref") ? "link" : form.referralCode ? "code" : "",
+        }),
       });
-      // Navigate to dashboard (for demo since API doesn't exist)
+
+      const payload = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(payload?.message || "Signup failed");
+      }
+
+      if (payload?.data?.email) {
+        localStorage.setItem("qc_user_email", payload.data.email);
+      }
+      if (payload?.data?.token) {
+        localStorage.setItem("qc_auth_token", payload.data.token);
+      }
+      if (payload?.data?.role) {
+        localStorage.setItem("qc_user_role", payload.data.role);
+      }
+      if (payload?.data?.username) {
+        localStorage.setItem("qc_user_name", payload.data.username);
+      }
+      if (payload?.data?.businessName) {
+        localStorage.setItem("qc_business_name", payload.data.businessName);
+      }
+      if (payload?.data?.ownerPhone) {
+        localStorage.setItem("qc_owner_phone", payload.data.ownerPhone);
+      }
+      if (payload?.data?.inboundNumber) {
+        localStorage.setItem("qc_inbound_number", payload.data.inboundNumber);
+      } else {
+        localStorage.removeItem("qc_inbound_number");
+      }
+      if (payload?.data?.retellAgentId) {
+        localStorage.setItem("qc_retell_agent_id", payload.data.retellAgentId);
+      } else {
+        localStorage.removeItem("qc_retell_agent_id");
+      }
+      if (payload?.data?.provisioningStatus) {
+        localStorage.setItem("qc_provisioning_status", payload.data.provisioningStatus);
+      } else {
+        localStorage.removeItem("qc_provisioning_status");
+      }
+      if (payload?.data?.timezone) {
+        localStorage.setItem("qc_user_timezone", payload.data.timezone);
+      }
+      if (payload?.data?.referralCode) {
+        localStorage.setItem("qc_referral_code", payload.data.referralCode);
+      }
+
+      const authToken = payload?.data?.token;
+      if (!authToken) {
+        throw new Error("Signup succeeded but auth token is missing.");
+      }
+
+      localStorage.setItem("qc_onboarding_country", form.country);
+      localStorage.setItem("qc_business_website", form.websiteUrl.trim());
+
+      const websiteUrl = form.websiteUrl.trim();
+
+      if (websiteUrl) {
+        setLoadingStep("Extracting website data...");
+        await fetch("/api/auth/import-website-knowledge", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            websiteUrl,
+          }),
+        }).catch(() => null);
+      }
+
+      setLoadingStep("Assigning business number...");
+      const provisionRes = await fetch("/api/auth/provision-number", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          country: form.country,
+          autoAssign: true,
+          skipRetell: true,
+        }),
+      });
+
+      const provisionPayload = await provisionRes.json().catch(() => null);
+      if (!provisionRes.ok) {
+        throw new Error(provisionPayload?.message || "Failed to auto-assign business number");
+      }
+
+      if (provisionPayload?.data?.inboundNumber) {
+        localStorage.setItem("qc_inbound_number", provisionPayload.data.inboundNumber);
+      }
+      if (provisionPayload?.data?.retellAgentId) {
+        localStorage.setItem("qc_retell_agent_id", provisionPayload.data.retellAgentId);
+      }
+      if (provisionPayload?.data?.provisioningStatus) {
+        localStorage.setItem("qc_provisioning_status", provisionPayload.data.provisioningStatus);
+      }
+
+      setLoadingStep("Setting up voice agent...");
+      const retellRes = await fetch("/api/auth/provision-retell-agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({}),
+      });
+
+      const retellPayload = await retellRes.json().catch(() => null);
+      if (!retellRes.ok) {
+        throw new Error(retellPayload?.message || "Failed to setup voice agent");
+      }
+
+      if (retellPayload?.data?.retellAgentId) {
+        localStorage.setItem("qc_retell_agent_id", retellPayload.data.retellAgentId);
+      }
+      if (retellPayload?.data?.provisioningStatus) {
+        localStorage.setItem("qc_provisioning_status", retellPayload.data.provisioningStatus);
+      }
+
+      setLoadingStep("Finalizing dashboard...");
       navigate("/dashboard");
-    } catch {
-      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err?.message || "Signup failed");
     } finally {
+      setLoadingStep("");
       setLoading(false);
     }
   };
@@ -112,31 +264,17 @@ export default function Signup() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Jane Smith"
-                  className="mt-1.5 h-10"
-                  value={form.name}
-                  onChange={(e) => update("name", e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone" className="text-sm font-medium">Phone</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="+1 (555) 000-0000"
-                  className="mt-1.5 h-10"
-                  value={form.phone}
-                  onChange={(e) => update("phone", e.target.value)}
-                  required
-                />
-              </div>
+            <div>
+              <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Jane Smith"
+                className="mt-1.5 h-10"
+                value={form.name}
+                onChange={(e) => update("name", e.target.value)}
+                required
+              />
             </div>
 
             <div>
@@ -149,6 +287,44 @@ export default function Signup() {
                 value={form.businessName}
                 onChange={(e) => update("businessName", e.target.value)}
                 required
+              />
+            </div>
+            <div>
+              <Label htmlFor="country" className="text-sm font-medium">Business Country</Label>
+              <select
+                id="country"
+                className="mt-1.5 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                value={form.country}
+                onChange={(e) => update("country", e.target.value.toUpperCase())}
+              >
+                {countryOptions.map((item) => (
+                  <option key={item.code} value={item.code}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="referralCode" className="text-sm font-medium">Referral Code (optional)</Label>
+              <Input
+                id="referralCode"
+                type="text"
+                placeholder="Enter referral code"
+                className="mt-1.5 h-10"
+                value={form.referralCode}
+                onChange={(e) => update("referralCode", e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="websiteUrl" className="text-sm font-medium">Business Website (optional)</Label>
+              <Input
+                id="websiteUrl"
+                type="url"
+                placeholder="https://yourbusiness.com"
+                className="mt-1.5 h-10"
+                value={form.websiteUrl}
+                onChange={(e) => update("websiteUrl", e.target.value)}
               />
             </div>
 
@@ -197,7 +373,12 @@ export default function Signup() {
               disabled={loading}
               className="w-full h-10 bg-gradient-primary hover:opacity-90 text-primary-foreground font-semibold"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create account"}
+              {loading ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {loadingStep || "Setting up..."}
+                </span>
+              ) : "Create account"}
             </Button>
           </form>
 

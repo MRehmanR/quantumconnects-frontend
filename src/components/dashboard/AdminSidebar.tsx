@@ -12,6 +12,22 @@ const navItems = [
 export default function AdminSidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    localStorage.removeItem("qc_auth_token");
+    localStorage.removeItem("qc_user_role");
+    localStorage.removeItem("qc_user_email");
+    localStorage.removeItem("qc_referral_code");
+    localStorage.removeItem("qc_inbound_number");
+    localStorage.removeItem("qc_user_name");
+    localStorage.removeItem("qc_business_name");
+    localStorage.removeItem("qc_owner_phone");
+    localStorage.removeItem("qc_user_timezone");
+    localStorage.removeItem("qc_retell_agent_id");
+    localStorage.removeItem("qc_provisioning_status");
+    navigate("/login");
+  };
+
   return (
     <aside className={cn("fixed left-0 top-0 h-full z-40 flex flex-col border-r border-border bg-card transition-all duration-200", collapsed ? "w-16" : "w-60")}>
       <div className={cn("flex h-16 items-center border-b border-border px-4", collapsed ? "justify-center" : "gap-2")}>
@@ -33,10 +49,10 @@ export default function AdminSidebar({ collapsed, onToggle }: { collapsed: boole
         })}
       </nav>
       <div className="border-t border-border p-2 space-y-1">
-        <Link to="/dashboard" className={cn("sidebar-item", collapsed ? "justify-center px-2" : "")}>
-          <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-          {!collapsed && <span>Customer View</span>}
-        </Link>
+        <button onClick={handleSignOut} className={cn("sidebar-item w-full", collapsed ? "justify-center px-2" : "")}> 
+          <LogOut className="h-4 w-4 flex-shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
+        </button>
         <button onClick={onToggle} className={cn("w-full flex items-center rounded-md p-2 text-xs text-muted-foreground hover:bg-muted transition-colors", collapsed ? "justify-center" : "gap-2")}>
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <><ChevronLeft className="h-4 w-4" /><span>Collapse</span></>}
         </button>

@@ -1,13 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, MoreHorizontal, UserX, Edit } from "lucide-react";
+import { Search, UserX, Edit } from "lucide-react";
 import AdminShell from "@/components/dashboard/AdminShell";
 import { Input } from "@/components/ui/input";
-import { mockData } from "@/lib/api";
+import { adminApi, type AdminUserItem } from "@/lib/api";
 
 export default function AdminUsers() {
   const [search, setSearch] = useState("");
-  const users = mockData.adminUsers.filter(u =>
+  const [allUsers, setAllUsers] = useState<AdminUserItem[]>([]);
+
+  useEffect(() => {
+    const run = async () => {
+      const data = await adminApi.getUsers();
+      setAllUsers(data);
+    };
+
+    run();
+  }, []);
+
+  const users = allUsers.filter(u =>
     u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase()) ||
     u.business.toLowerCase().includes(search.toLowerCase())

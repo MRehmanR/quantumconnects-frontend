@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter, Phone, PlayCircle, FileText, ChevronDown } from "lucide-react";
+import { Search, Phone, PlayCircle, FileText, ChevronDown } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { mockData } from "@/lib/api";
+import { callsApi, type CallLogItem } from "@/lib/api";
 
 const sentimentColors: Record<string, string> = {
   Positive: "status-completed",
@@ -22,16 +21,29 @@ export default function CallLogs() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [calls, setCalls] = useState<CallLogItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const run = async () => {
+      setLoading(true);
+      try {
+        const data = await callsApi.getAll({
+          search: search || undefined,
+          filter: filter === "All" ? undefined : filter,
+        });
+        setCalls(data);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    run();
+  }, [search, filter]);
 
   const filters = ["All", "Completed", "Escalated", "Missed"];
 
-  const filtered = mockData.calls.filter((c) => {
-    const matchSearch =
-      c.callerNumber.toLowerCase().includes(search.toLowerCase()) ||
-      c.transcript.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filter === "All" || c.status === filter;
-    return matchSearch && matchFilter;
-  });
+  const filtered = calls;
 
   return (
     <DashboardShell>
@@ -41,7 +53,7 @@ export default function CallLogs() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search calls or transcripts..."
+              placeholder="Search name, phone, email or transcripts..."
               className="pl-9 h-9 text-sm bg-card"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -70,26 +82,31 @@ export default function CallLogs() {
           animate={{ opacity: 1, y: 0 }}
           className="card-surface overflow-hidden"
         >
+          <div className="overflow-x-auto">
           {/* Table header */}
-          <div className="grid grid-cols-12 gap-4 px-5 py-3 border-b border-border bg-muted/30 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <div className="grid grid-cols-12 gap-4 px-5 py-3 border-b border-border bg-muted/30 text-xs font-semibold uppercase tracking-wide text-muted-foreground min-w-[900px]">
             <div className="col-span-3">Caller</div>
             <div className="col-span-2">Date & Time</div>
             <div className="col-span-1">Duration</div>
             <div className="col-span-2">Sentiment</div>
-            <div className="col-span-2">Status</div>
-            <div className="col-span-2">Actions</div>
+            <div className="col-span-1">Status</div>
+            <div className="col-span-3">Actions</div>
           </div>
 
           {/* Rows */}
           <div className="divide-y divide-border">
             {filtered.map((call) => (
               <div key={call.id}>
-                <div className="grid grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-muted/30 transition-colors">
+                <div className="grid grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-muted/30 transition-colors min-w-[900px]">
                   <div className="col-span-3 flex items-center gap-2.5">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
                       <Phone className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <span className="text-sm font-medium text-foreground">{call.callerNumber}</span>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{call.callerName}</p>
+                      <p className="text-xs text-muted-foreground">{call.callerPhone}</p>
+                      <p className="text-xs text-muted-foreground">{call.callerEmail || "No email"}</p>
+                    </div>
                   </div>
                   <div className="col-span-2">
                     <div className="text-sm text-foreground">{call.date}</div>
@@ -101,15 +118,19 @@ export default function CallLogs() {
                       {call.sentiment}
                     </span>
                   </div>
-                  <div className="col-span-2">
+                  <div className="col-span-1">
                     <span className={`status-badge ${statusColors[call.status] || "status-active"}`}>
                       {call.status}
                     </span>
                   </div>
-                  <div className="col-span-2 flex items-center gap-2">
-                    <button className="flex items-center gap-1 text-xs text-primary hover:underline font-medium">
+                  <div className="col-span-3 flex items-center gap-2">
+                    <button
+                      disabled
+                      className="flex items-center gap-1 text-xs text-muted-foreground cursor-not-allowed font-medium"
+                      title="Call recording playback is not available yet"
+                    >
                       <PlayCircle className="h-3.5 w-3.5" />
-                      Play
+                      Play Soon
                     </button>
                     <button
                       className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
@@ -141,17 +162,18 @@ export default function CallLogs() {
               </div>
             ))}
           </div>
+          </div>
 
           {filtered.length === 0 && (
             <div className="px-5 py-16 text-center">
               <Phone className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">No calls match your search</p>
+              <p className="text-sm text-muted-foreground">{loading ? "Loading call logs..." : "No calls match your search"}</p>
             </div>
           )}
         </motion.div>
 
         <p className="text-xs text-muted-foreground text-right">
-          Showing {filtered.length} of {mockData.calls.length} calls
+          Showing {filtered.length} calls
         </p>
       </div>
     </DashboardShell>

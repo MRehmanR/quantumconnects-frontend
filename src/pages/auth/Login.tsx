@@ -18,17 +18,60 @@ export default function Login() {
     setLoading(true);
     setError("");
     try {
-      // POST /api/auth/login
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error("Invalid email or password");
-      navigate("/dashboard");
+
+      const payload = await res.json().catch(() => null);
+      if (!res.ok || !payload?.data?.token || !payload?.data?.user?.role) {
+        throw new Error(payload?.message || "Invalid email or password");
+      }
+
+      const email = payload.data.user.email || form.email;
+      localStorage.setItem("qc_auth_token", payload.data.token);
+      localStorage.setItem("qc_user_role", payload.data.user.role);
+      if (payload?.data?.user?.username) {
+        localStorage.setItem("qc_user_name", payload.data.user.username);
+      }
+      if (email) {
+        localStorage.setItem("qc_user_email", email);
+      }
+      if (payload?.data?.user?.businessName) {
+        localStorage.setItem("qc_business_name", payload.data.user.businessName);
+      }
+      if (payload?.data?.user?.ownerPhone) {
+        localStorage.setItem("qc_owner_phone", payload.data.user.ownerPhone);
+      }
+      if (payload?.data?.user?.inboundNumber) {
+        localStorage.setItem("qc_inbound_number", payload.data.user.inboundNumber);
+      } else {
+        localStorage.removeItem("qc_inbound_number");
+      }
+      if (payload?.data?.user?.retellAgentId) {
+        localStorage.setItem("qc_retell_agent_id", payload.data.user.retellAgentId);
+      } else {
+        localStorage.removeItem("qc_retell_agent_id");
+      }
+      if (payload?.data?.user?.provisioningStatus) {
+        localStorage.setItem("qc_provisioning_status", payload.data.user.provisioningStatus);
+      } else {
+        localStorage.removeItem("qc_provisioning_status");
+      }
+      if (payload?.data?.user?.timezone) {
+        localStorage.setItem("qc_user_timezone", payload.data.user.timezone);
+      }
+      if (payload?.data?.user?.referralCode) {
+        localStorage.setItem("qc_referral_code", payload.data.user.referralCode);
+      }
+      if (payload.data.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate(payload?.data?.user?.inboundNumber ? "/dashboard" : "/onboarding/setup");
+      }
     } catch (err: any) {
-      // For demo: navigate anyway since API doesn't exist
-      navigate("/dashboard");
+      setError(err?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -143,10 +186,6 @@ export default function Login() {
             <Link to="/signup" className="font-medium text-primary hover:underline">
               Sign up free
             </Link>
-          </p>
-
-          <p className="mt-8 text-center text-xs text-muted-foreground">
-            <Link to="/admin" className="hover:text-primary transition-colors">Admin portal →</Link>
           </p>
         </motion.div>
       </div>
