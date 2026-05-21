@@ -142,7 +142,7 @@ export type KnowledgeBaseItem = {
 export type FeatureToggleConfig = {
   callHandling: {
     appointmentBooking: { enabled: boolean };
-    depositCollection: { enabled: boolean; amount: number; paymentWindowHours: number };
+    depositCollection: { enabled: boolean; amount: number; amountType: "fixed" | "percentage"; paymentWindowHours: number };
     waitlistManagement: { enabled: boolean };
     urgentCallRouting: { enabled: boolean; triggerKeywords: string[]; transferNumber: string };
     outOfHoursHandling: { enabled: boolean; openingHours: string };
@@ -161,7 +161,7 @@ export type FeatureToggleConfig = {
   businessConfiguration: {
     customVoice: { enabled: boolean; mode: string };
     multiLanguageSupport: { enabled: boolean; languages: string[] };
-    customHoldMusic: { enabled: boolean };
+    customHoldMusic: { enabled: boolean; trackUrl: string };
     personalisedGreetingScript: { enabled: boolean; openingLine: string };
     staffNameMentions: { enabled: boolean; staffNames: string[] };
   };

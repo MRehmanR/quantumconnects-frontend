@@ -270,40 +270,65 @@ export default function Settings() {
                   />
                   <ToggleRow
                     title="Deposit collection"
-                    description="Collect deposits and configure amount/window"
+                    description="Collect deposits and configure amount, type, and payment window"
                     enabled={toggles.callHandling.depositCollection.enabled}
                     onToggle={(enabled) =>
                       setToggles({ ...toggles, callHandling: { ...toggles.callHandling, depositCollection: { ...toggles.callHandling.depositCollection, enabled } } })
                     }
                   >
                     {toggles.callHandling.depositCollection.enabled && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <Input
-                          type="number"
-                          value={toggles.callHandling.depositCollection.amount}
-                          onChange={(e) => setToggles({
-                            ...toggles,
-                            callHandling: {
-                              ...toggles.callHandling,
-                              depositCollection: { ...toggles.callHandling.depositCollection, amount: Number(e.target.value) },
-                            },
-                          })}
-                          placeholder="Deposit amount"
-                          className="h-8 text-xs"
-                        />
-                        <Input
-                          type="number"
-                          value={toggles.callHandling.depositCollection.paymentWindowHours}
-                          onChange={(e) => setToggles({
-                            ...toggles,
-                            callHandling: {
-                              ...toggles.callHandling,
-                              depositCollection: { ...toggles.callHandling.depositCollection, paymentWindowHours: Number(e.target.value) },
-                            },
-                          })}
-                          placeholder="Payment window (hours)"
-                          className="h-8 text-xs"
-                        />
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-[11px] text-muted-foreground">Deposit type</Label>
+                          <select
+                            value={toggles.callHandling.depositCollection.amountType ?? "fixed"}
+                            onChange={(e) => setToggles({
+                              ...toggles,
+                              callHandling: {
+                                ...toggles.callHandling,
+                                depositCollection: { ...toggles.callHandling.depositCollection, amountType: e.target.value as "fixed" | "percentage" },
+                              },
+                            })}
+                            className="flex h-8 w-full rounded-md border border-input bg-background px-2 text-xs text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          >
+                            <option value="fixed">Fixed amount</option>
+                            <option value="percentage">Percentage</option>
+                          </select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[11px] text-muted-foreground">
+                            {(toggles.callHandling.depositCollection.amountType ?? "fixed") === "percentage" ? "Deposit %" : "Deposit amount"}
+                          </Label>
+                          <Input
+                            type="number"
+                            value={toggles.callHandling.depositCollection.amount}
+                            onChange={(e) => setToggles({
+                              ...toggles,
+                              callHandling: {
+                                ...toggles.callHandling,
+                                depositCollection: { ...toggles.callHandling.depositCollection, amount: Number(e.target.value) },
+                              },
+                            })}
+                            placeholder={(toggles.callHandling.depositCollection.amountType ?? "fixed") === "percentage" ? "10" : "25"}
+                            className="h-8 text-xs"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[11px] text-muted-foreground">Payment window (hours)</Label>
+                          <Input
+                            type="number"
+                            value={toggles.callHandling.depositCollection.paymentWindowHours}
+                            onChange={(e) => setToggles({
+                              ...toggles,
+                              callHandling: {
+                                ...toggles.callHandling,
+                                depositCollection: { ...toggles.callHandling.depositCollection, paymentWindowHours: Number(e.target.value) },
+                              },
+                            })}
+                            placeholder="24"
+                            className="h-8 text-xs"
+                          />
+                        </div>
                       </div>
                     )}
                   </ToggleRow>
@@ -354,7 +379,22 @@ export default function Settings() {
                       <Input className="h-8 text-xs" value={toggles.businessConfiguration.multiLanguageSupport.languages.join(", ")} onChange={(e) => setToggles({ ...toggles, businessConfiguration: { ...toggles.businessConfiguration, multiLanguageSupport: { ...toggles.businessConfiguration.multiLanguageSupport, languages: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) } } })} placeholder="English, Spanish" />
                     )}
                   </ToggleRow>
-                  <ToggleRow title="Custom hold music" description="Play business-specific hold music" enabled={toggles.businessConfiguration.customHoldMusic.enabled} onToggle={(enabled) => setToggles({ ...toggles, businessConfiguration: { ...toggles.businessConfiguration, customHoldMusic: { enabled } } })} />
+                  <ToggleRow title="Custom hold music" description="Play business-specific hold music" enabled={toggles.businessConfiguration.customHoldMusic.enabled} onToggle={(enabled) => setToggles({ ...toggles, businessConfiguration: { ...toggles.businessConfiguration, customHoldMusic: { ...toggles.businessConfiguration.customHoldMusic, enabled } } })}>
+                    {toggles.businessConfiguration.customHoldMusic.enabled && (
+                      <Input
+                        className="h-8 text-xs"
+                        value={toggles.businessConfiguration.customHoldMusic.trackUrl ?? ""}
+                        onChange={(e) => setToggles({
+                          ...toggles,
+                          businessConfiguration: {
+                            ...toggles.businessConfiguration,
+                            customHoldMusic: { ...toggles.businessConfiguration.customHoldMusic, trackUrl: e.target.value },
+                          },
+                        })}
+                        placeholder="https://yourcdn.com/hold-music.mp3"
+                      />
+                    )}
+                  </ToggleRow>
                   <ToggleRow title="Personalised greeting script" description="Set your preferred opening line" enabled={toggles.businessConfiguration.personalisedGreetingScript.enabled} onToggle={(enabled) => setToggles({ ...toggles, businessConfiguration: { ...toggles.businessConfiguration, personalisedGreetingScript: { ...toggles.businessConfiguration.personalisedGreetingScript, enabled } } })}>
                     {toggles.businessConfiguration.personalisedGreetingScript.enabled && (
                       <Input className="h-8 text-xs" value={toggles.businessConfiguration.personalisedGreetingScript.openingLine} onChange={(e) => setToggles({ ...toggles, businessConfiguration: { ...toggles.businessConfiguration, personalisedGreetingScript: { ...toggles.businessConfiguration.personalisedGreetingScript, openingLine: e.target.value } } })} placeholder="Preferred opening line" />
@@ -370,7 +410,6 @@ export default function Settings() {
                 <div className="card-surface p-6">
                   <h3 className="text-sm font-semibold text-foreground">Payments</h3>
                   <p className="text-xs text-muted-foreground mt-0.5 mb-4">Payment and refund handling behaviour</p>
-                  <ToggleRow title="Deposit collection" description="Enable deposits per service" enabled={toggles.payments.depositCollection.enabled} onToggle={(enabled) => setToggles({ ...toggles, payments: { ...toggles.payments, depositCollection: { ...toggles.payments.depositCollection, enabled } } })} />
                   <ToggleRow title="Payment confirmation SMS to client" description="Send SMS once payment is confirmed" enabled={toggles.payments.paymentConfirmationSms.enabled} onToggle={(enabled) => setToggles({ ...toggles, payments: { ...toggles.payments, paymentConfirmationSms: { enabled } } })} />
                   <ToggleRow title="Refund handling script" description="Use refund-response script during calls" enabled={toggles.payments.refundHandlingScript.enabled} onToggle={(enabled) => setToggles({ ...toggles, payments: { ...toggles.payments, refundHandlingScript: { enabled } } })} />
                 </div>
