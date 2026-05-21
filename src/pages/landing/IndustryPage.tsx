@@ -59,9 +59,9 @@ export default function IndustryPage({
       </section>
 
       {/* Pain Point Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 bg-secondary">
         <div className="container max-w-3xl mx-auto">
-          <div className="bg-secondary p-8 rounded-lg border border-border">
+          <div className="bg-white p-8 rounded-lg border border-border shadow-sm">
             <h2 className="text-2xl font-bold text-foreground mb-4">
               The Challenge
             </h2>
@@ -138,7 +138,7 @@ export default function IndustryPage({
       )}
 
       {/* Features Comparison */}
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 bg-secondary">
         <div className="container max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             What You Get
@@ -155,7 +155,7 @@ export default function IndustryPage({
               "Google Reviews automation",
               "Integration with your existing systems",
             ].map((feature, index) => (
-              <div key={index} className="flex gap-3 items-start p-4 bg-secondary rounded-lg">
+              <div key={index} className="flex gap-3 items-start p-4 bg-white border border-border rounded-lg shadow-sm">
                 <CheckCircle className="w-6 h-6 text-accent flex-shrink-0 mt-0.5" />
                 <p className="text-foreground">{feature}</p>
               </div>
