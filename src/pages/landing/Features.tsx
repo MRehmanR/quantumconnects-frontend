@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import {
   Phone,
   Calendar,
@@ -183,21 +183,21 @@ export default function Features() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              "Google Calendar",
-              "Outlook",
-              "Zapier",
-              "Stripe",
-              "Twilio",
-              "Slack",
-              "HubSpot",
-              "Mailchimp",
-              "and more...",
+              { label: "Google Calendar" },
+              { label: "Outlook" },
+              { label: "Zapier" },
+              { label: "Stripe" },
+              { label: "Twilio" },
+              { label: "Slack" },
+              { label: "HubSpot" },
+              { label: "Mailchimp" },
+              { label: "and more...", className: "col-span-2 md:col-start-2 md:col-span-2" },
             ].map((integration, index) => (
               <Card
                 key={index}
-                className="p-6 text-center border border-border hover:border-primary transition-colors"
+                className={`p-6 text-center border border-border hover:border-primary transition-colors ${integration.className || ""}`}
               >
-                <p className="font-semibold text-foreground">{integration}</p>
+                <p className="font-semibold text-foreground">{integration.label}</p>
               </Card>
             ))}
           </div>
@@ -271,27 +271,17 @@ export default function Features() {
           <p className="text-lg mb-8 text-blue-100 max-w-2xl mx-auto">
             Try Quantum Connects for 7 days with full access to all features.
           </p>
-          <Link href="/book-demo">
-            <a>
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-blue-50 mr-4"
-              >
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button asChild size="lg" className="bg-white text-primary hover:bg-blue-50">
+              <Link to="/book-demo">
                 Schedule a Demo
                 <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </a>
-          </Link>
-          <Link href="/">
-            <a>
-              <Button
-                size="lg"
-                className="bg-transparent text-white border-2 border-white hover:bg-white/10"
-              >
-                Start Your Free Trial
-              </Button>
-            </a>
-          </Link>
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link to="/signup">Start Free Trial</Link>
+            </Button>
+          </div>
         </div>
       </section>
 

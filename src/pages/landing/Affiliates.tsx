@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { CheckCircle, TrendingUp, Users, Zap, ArrowRight } from "lucide-react";
 
 export default function Affiliates() {
@@ -22,14 +22,12 @@ export default function Affiliates() {
               Join our affiliate program and earn 10% recurring commission on
               every paying customer you refer. Based on our Core package (£249/month).
             </p>
-            <Link href="/">
-              <a>
-                <Button size="lg" className="bg-primary hover:bg-primary/90">
-                  Become an Affiliate
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+              <Link to="/contact">
+                Become an Affiliate
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -276,17 +274,12 @@ export default function Affiliates() {
             Join our growing network of affiliates earning recurring commissions
             by referring Quantum Connects.
           </p>
-          <Link href="/">
-            <a>
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-blue-50"
-              >
-                Become an Affiliate
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </a>
-          </Link>
+          <Button asChild size="lg" className="bg-white text-primary hover:bg-blue-50">
+            <Link to="/contact">
+              Become an Affiliate
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+          </Button>
         </div>
       </section>
 

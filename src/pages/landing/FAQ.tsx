@@ -5,7 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 
 export default function FAQ() {
   const faqs = [
@@ -156,24 +156,12 @@ export default function FAQ() {
               Our team is here to help. Get in touch via email or chat.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact">
-                <a>
-                  <Button size="lg" className="bg-white text-primary hover:bg-slate-100">
-                    Contact Us
-                  </Button>
-                </a>
-              </Link>
-              <Link href="/signup">
-                <a>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-white text-white hover:bg-white/10"
-                  >
-                    Start Free Trial
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild size="lg" className="bg-white text-primary hover:bg-slate-100">
+                <Link to="/contact">Contact Us</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                <Link to="/signup">Start Free Trial</Link>
+              </Button>
             </div>
           </div>
         </div>

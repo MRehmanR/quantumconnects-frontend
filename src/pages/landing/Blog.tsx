@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, User } from "lucide-react";
 
 export default function Blog() {
@@ -208,17 +208,12 @@ export default function Blog() {
             Start your free trial today and see how Quantum Connects can
             revolutionize your customer communication.
           </p>
-          <Link href="/">
-            <a>
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-blue-50"
-              >
-                Start Your Free Trial
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </a>
-          </Link>
+          <Button asChild size="lg" className="bg-white text-primary hover:bg-blue-50">
+            <Link to="/signup">
+              Start Your Free Trial
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+          </Button>
         </div>
       </section>
 

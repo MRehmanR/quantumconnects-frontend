@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { CheckCircle, TrendingUp, Clock, Phone, ArrowRight } from "lucide-react";
 
 interface IndustryPageProps {
@@ -48,14 +48,12 @@ export default function IndustryPage({
               {title}
             </h1>
             <p className="text-xl text-muted-foreground mb-8">{subtitle}</p>
-            <Link href="/book-demo">
-              <a>
-                <Button size="lg" className="bg-primary hover:bg-primary/90">
-                  Schedule a Demo
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+              <Link to="/book-demo">
+                Schedule a Demo
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -193,14 +191,12 @@ export default function IndustryPage({
           <p className="text-muted-foreground mb-8">
             Start with a free 7-day trial. No credit card required.
           </p>
-          <Link href="/book-demo">
-            <a>
-              <Button size="lg" className="bg-primary hover:bg-primary/90">
-                Schedule a Demo
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </a>
-          </Link>
+          <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+            <Link to="/book-demo">
+              Schedule a Demo
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+          </Button>
         </div>
       </section>
 
@@ -213,27 +209,17 @@ export default function IndustryPage({
           <p className="text-lg mb-8 text-blue-100 max-w-2xl mx-auto">
             Join hundreds of businesses already using Quantum Connects to capture every customer call.
           </p>
-          <Link href="/book-demo">
-            <a>
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-blue-50 mr-4"
-              >
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button asChild size="lg" className="bg-white text-primary hover:bg-blue-50">
+              <Link to="/book-demo">
                 Schedule a Demo
                 <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </a>
-          </Link>
-          <Link href="/">
-            <a>
-              <Button
-                size="lg"
-                className="bg-transparent text-white border-2 border-white hover:bg-white/10"
-              >
-                Start Your Free Trial
-              </Button>
-            </a>
-          </Link>
+              </Link>
+            </Button>
+            <Button asChild size="lg" className="bg-transparent text-white border-2 border-white hover:bg-white/10">
+              <Link to="/signup">Start Your Free Trial</Link>
+            </Button>
+          </div>
         </div>
       </section>
 

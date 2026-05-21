@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { Clock, ArrowRight } from "lucide-react";
 
 export default function WhiteLabel() {
@@ -50,21 +50,15 @@ export default function WhiteLabel() {
 
           {/* CTA */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/contact">
-              <a>
-                <Button size="lg" className="bg-primary hover:bg-primary/90">
-                  Notify Me When Ready
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </a>
-            </Link>
-            <Link href="/">
-              <a>
-                <Button size="lg" variant="outline">
-                  Back to Home
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+              <Link to="/contact">
+                Notify Me When Ready
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link to="/">Back to Home</Link>
+            </Button>
           </div>
         </div>
       </div>

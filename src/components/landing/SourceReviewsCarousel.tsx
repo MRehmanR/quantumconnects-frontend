@@ -158,7 +158,7 @@ export default function SourceReviewsCarousel() {
           }
 
           .reviews-scroll {
-            animation: scroll-left 60s linear infinite;
+            animation: scroll-left 30s linear infinite;
           }
 
           .reviews-scroll:hover {

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { ArrowRight, Zap, Users, Target } from "lucide-react";
 
 export default function About() {
@@ -46,14 +46,12 @@ export default function About() {
                 what they do best: delivering exceptional service to their
                 customers.
               </p>
-              <Link href="/">
-                <a>
-                  <Button className="bg-primary hover:bg-primary/90">
-                    Start Your Free Trial
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild className="bg-primary hover:bg-primary/90">
+                <Link to="/signup">
+                  Start Your Free Trial
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </Button>
             </div>
             <div className="bg-gradient-to-br from-blue-100 to-teal-100 rounded-lg h-96" />
           </div>
@@ -120,7 +118,7 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
               {
-                name: "Alex Johnson",
+                name: "Umar Jahangir",
                 role: "Founder & CEO",
                 bio: "Former VP of Product at a leading telecom company with 15+ years in AI and voice technology.",
               },
@@ -181,14 +179,12 @@ export default function About() {
             Become part of a community of service businesses transforming how
             they handle customer communication.
           </p>
-          <Link href="/">
-            <a>
-              <Button size="lg" className="bg-primary hover:bg-primary/90">
-                Start Your Free Trial
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </a>
-          </Link>
+          <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+            <Link to="/signup">
+              Start Your Free Trial
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+          </Button>
         </div>
       </section>
 

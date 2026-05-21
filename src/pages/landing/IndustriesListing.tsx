@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -46,20 +46,19 @@ export default function IndustriesListing() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {categoryIndustries.map((industry) => (
-                    <Link key={industry.slug} href={`/industries/${industry.slug}`}>
-                      <a>
-                        <Card className="p-6 border border-border hover:border-primary hover:shadow-lg transition-all h-full cursor-pointer group">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex-1">
-                              <div className="text-3xl mb-2">
-                                {industry.icon || "🏢"}
-                              </div>
-                              <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
-                                {industry.title.replace("AI Receptionist for ", "")}
-                              </h3>
+                    <Link key={industry.slug} to={`/industries/${industry.slug}`} className="block">
+                      <Card className="p-6 border border-border hover:border-primary hover:shadow-lg transition-all h-full cursor-pointer group">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <div className="text-3xl mb-2">
+                              {industry.icon || "🏢"}
                             </div>
-                            <ArrowRight className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2" />
+                            <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                              {industry.title.replace("AI Receptionist for ", "")}
+                            </h3>
                           </div>
+                          <ArrowRight className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2" />
+                        </div>
 
                           <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
                             {industry.subtitle}
@@ -80,16 +79,15 @@ export default function IndustriesListing() {
                           </div>
 
                           {/* CTA */}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all"
-                          >
-                            Learn More
-                            <ArrowRight className="ml-2 w-4 h-4" />
-                          </Button>
-                        </Card>
-                      </a>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all"
+                        >
+                          Learn More
+                          <ArrowRight className="ml-2 w-4 h-4" />
+                        </Button>
+                      </Card>
                     </Link>
                   ))}
                 </div>
@@ -308,28 +306,22 @@ export default function IndustriesListing() {
             No matter your industry, Quantum Connects has a solution tailored to
             your needs. Join over 500+ service businesses already using Quantum Connects.
           </p>
-          <Link href="/book-demo">
-            <a>
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-blue-50 mr-4"
-              >
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button asChild size="lg" className="bg-white text-primary hover:bg-blue-50">
+              <Link to="/book-demo">
                 Schedule a Demo
                 <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </a>
-          </Link>
-          <Link href="/">
-            <a>
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-white border-white hover:bg-blue-600"
-              >
-                Start Your Free Trial
-              </Button>
-            </a>
-          </Link>
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="text-white border-white hover:bg-blue-600"
+            >
+              <Link to="/signup">Start Your Free Trial</Link>
+            </Button>
+          </div>
         </div>
       </section>
 

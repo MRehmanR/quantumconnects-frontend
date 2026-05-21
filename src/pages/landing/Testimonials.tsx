@@ -1,6 +1,6 @@
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 
 export default function Testimonials() {
   const testimonials = [
@@ -209,13 +209,9 @@ export default function Testimonials() {
             <p className="text-lg text-blue-100 mb-8">
               Start your free 7-day trial and see the difference Quantum Connects can make
             </p>
-            <Link href="/signup">
-              <a>
-                <Button size="lg" className="bg-white text-primary hover:bg-slate-100">
-                  Start Free Trial
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="lg" className="bg-white text-primary hover:bg-slate-100">
+              <Link to="/signup">Start Free Trial</Link>
+            </Button>
           </div>
         </div>
       </section>

@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { CheckCircle, ArrowRight, Zap, Mail, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -212,17 +212,16 @@ export default function Pricing() {
                   <p className="text-muted-foreground">CRM Integration: <span className="text-foreground font-medium">{plan.crmIntegration}</span></p>
                 </div>
 
-                <Link href="/book-demo">
-                  <a className="block mb-8">
-                    <Button
-                      className="w-full"
-                      variant={plan.highlighted ? "default" : "outline"}
-                    >
-                      {plan.cta}
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </a>
-                </Link>
+                <Button
+                  asChild
+                  className="w-full mb-8"
+                  variant={plan.highlighted ? "default" : "outline"}
+                >
+                  <Link to="/book-demo">
+                    {plan.cta}
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Link>
+                </Button>
 
                 <div className="space-y-4 flex-grow">
                   <p className="font-semibold text-foreground text-sm">All features included:</p>
@@ -383,27 +382,21 @@ export default function Pricing() {
             Join hundreds of service businesses already using Quantum Connects
             to never miss a call again.
           </p>
-          <Link href="/book-demo">
-            <a>
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-blue-50 mr-4"
-              >
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button asChild size="lg" className="bg-white text-primary hover:bg-blue-50">
+              <Link to="/book-demo">
                 Schedule a Demo
                 <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </a>
-          </Link>
-          <Link href="/">
-            <a>
-              <Button
-                size="lg"
-                className="bg-transparent text-white border-2 border-white hover:bg-white/10"
-              >
-                Start Your Free Trial
-              </Button>
-            </a>
-          </Link>
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              className="bg-transparent text-white border-2 border-white hover:bg-white/10"
+            >
+              <Link to="/signup">Start Your Free Trial</Link>
+            </Button>
+          </div>
           <p className="text-sm text-blue-100 mt-4">
             7 days free • No credit card required • Cancel anytime
           </p>

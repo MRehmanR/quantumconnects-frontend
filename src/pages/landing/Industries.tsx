@@ -1,4 +1,4 @@
-import { useParams } from "wouter";
+import { useParams } from "react-router-dom";
 import { Phone, Clock, TrendingUp } from "lucide-react";
 import IndustryPage from "./IndustryPage";
 import { getIndustryBySlug } from "@/lib/industries";
