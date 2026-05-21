@@ -161,7 +161,6 @@ export type FeatureToggleConfig = {
   businessConfiguration: {
     customVoice: { enabled: boolean; mode: string };
     multiLanguageSupport: { enabled: boolean; languages: string[] };
-    customHoldMusic: { enabled: boolean; trackUrl: string };
     personalisedGreetingScript: { enabled: boolean; openingLine: string };
     staffNameMentions: { enabled: boolean; staffNames: string[] };
   };

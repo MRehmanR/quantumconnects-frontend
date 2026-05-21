@@ -279,7 +279,7 @@ export default function Settings() {
                     {toggles.callHandling.depositCollection.enabled && (
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="space-y-1">
-                          <Label className="text-[11px] text-muted-foreground">Deposit type</Label>
+                          <Label className="text-xs text-foreground">Deposit type</Label>
                           <select
                             value={toggles.callHandling.depositCollection.amountType ?? "fixed"}
                             onChange={(e) => setToggles({
@@ -296,7 +296,7 @@ export default function Settings() {
                           </select>
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-[11px] text-muted-foreground">
+                          <Label className="text-xs text-foreground">
                             {(toggles.callHandling.depositCollection.amountType ?? "fixed") === "percentage" ? "Deposit %" : "Deposit amount"}
                           </Label>
                           <Input
@@ -314,7 +314,7 @@ export default function Settings() {
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-[11px] text-muted-foreground">Payment window (hours)</Label>
+                          <Label className="text-xs text-foreground">Payment window (hours)</Label>
                           <Input
                             type="number"
                             value={toggles.callHandling.depositCollection.paymentWindowHours}
@@ -377,22 +377,6 @@ export default function Settings() {
                   <ToggleRow title="Multi-language support" description="Enable multiple supported languages" enabled={toggles.businessConfiguration.multiLanguageSupport.enabled} onToggle={(enabled) => setToggles({ ...toggles, businessConfiguration: { ...toggles.businessConfiguration, multiLanguageSupport: { ...toggles.businessConfiguration.multiLanguageSupport, enabled } } })}>
                     {toggles.businessConfiguration.multiLanguageSupport.enabled && (
                       <Input className="h-8 text-xs" value={toggles.businessConfiguration.multiLanguageSupport.languages.join(", ")} onChange={(e) => setToggles({ ...toggles, businessConfiguration: { ...toggles.businessConfiguration, multiLanguageSupport: { ...toggles.businessConfiguration.multiLanguageSupport, languages: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) } } })} placeholder="English, Spanish" />
-                    )}
-                  </ToggleRow>
-                  <ToggleRow title="Custom hold music" description="Play business-specific hold music" enabled={toggles.businessConfiguration.customHoldMusic.enabled} onToggle={(enabled) => setToggles({ ...toggles, businessConfiguration: { ...toggles.businessConfiguration, customHoldMusic: { ...toggles.businessConfiguration.customHoldMusic, enabled } } })}>
-                    {toggles.businessConfiguration.customHoldMusic.enabled && (
-                      <Input
-                        className="h-8 text-xs"
-                        value={toggles.businessConfiguration.customHoldMusic.trackUrl ?? ""}
-                        onChange={(e) => setToggles({
-                          ...toggles,
-                          businessConfiguration: {
-                            ...toggles.businessConfiguration,
-                            customHoldMusic: { ...toggles.businessConfiguration.customHoldMusic, trackUrl: e.target.value },
-                          },
-                        })}
-                        placeholder="https://yourcdn.com/hold-music.mp3"
-                      />
                     )}
                   </ToggleRow>
                   <ToggleRow title="Personalised greeting script" description="Set your preferred opening line" enabled={toggles.businessConfiguration.personalisedGreetingScript.enabled} onToggle={(enabled) => setToggles({ ...toggles, businessConfiguration: { ...toggles.businessConfiguration, personalisedGreetingScript: { ...toggles.businessConfiguration.personalisedGreetingScript, enabled } } })}>
