@@ -46,7 +46,6 @@ function ToggleRow({
 }
 
 export default function Settings() {
-  const isAdmin = localStorage.getItem("qc_user_role") === "admin";
   const [active, setActive] = useState<"profile" | "toggles" | "notifications" | "security" | "referrals">("toggles");
   const [saving, setSaving] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
@@ -238,47 +237,6 @@ export default function Settings() {
                     <Label className="text-xs font-medium mb-1.5 block">Timezone</Label>
                     <Input className="h-9 text-sm" value={profile.timezone} onChange={(e) => setProfile({ ...profile, timezone: e.target.value })} />
                   </div>
-                  {!isAdmin ? (
-                    <>
-                      <div className="sm:col-span-2 pt-2 border-t border-border">
-                        <p className="text-xs font-semibold text-foreground mb-2">Per-Business SIP Trunk (Retell Import)</p>
-                        <p className="text-xs text-muted-foreground mb-3">
-                          These settings are saved per business and used when importing Twilio SIP numbers into Retell.
-                        </p>
-                      </div>
-                      <div>
-                        <Label className="text-xs font-medium mb-1.5 block">Termination URI</Label>
-                        <Input
-                          className="h-9 text-sm"
-                          placeholder="example.pstn.twilio.com"
-                          value={profile.retellSipTerminationUri}
-                          onChange={(e) => setProfile({ ...profile, retellSipTerminationUri: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs font-medium mb-1.5 block">SIP Username</Label>
-                        <Input
-                          className="h-9 text-sm"
-                          placeholder="Twilio SIP credential username"
-                          value={profile.retellSipTrunkAuthUsername}
-                          onChange={(e) => setProfile({ ...profile, retellSipTrunkAuthUsername: e.target.value })}
-                        />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <Label className="text-xs font-medium mb-1.5 block">SIP Password</Label>
-                        <Input
-                          type="password"
-                          className="h-9 text-sm"
-                          placeholder={hasSipPasswordSaved ? "Saved. Enter new value to rotate, or leave unchanged." : "Set SIP password"}
-                          value={profile.retellSipTrunkAuthPassword}
-                          onChange={(e) => {
-                            setSipPasswordTouched(true);
-                            setProfile({ ...profile, retellSipTrunkAuthPassword: e.target.value });
-                          }}
-                        />
-                      </div>
-                    </>
-                  ) : null}
                 </div>
                 {profileMessage && (
                   <p className={`text-xs ${profileMessage.includes("success") ? "text-accent" : "text-destructive"}`}>
