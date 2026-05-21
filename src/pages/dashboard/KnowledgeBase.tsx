@@ -50,6 +50,7 @@ const defaultReceptionistConfig: AiReceptionistConfigData = {
     buffer: "None",
     minNotice: "1 hour",
     maxSlotsPerCall: "2 slots",
+    services: [],
   },
   isActiveNow: false,
   timezone: "UTC",
@@ -61,6 +62,17 @@ const defaultFaqs = [
   { title: "Do you require a deposit?", content: "Yes, we request a deposit to confirm your booking." },
   { title: "What is your cancellation policy?", content: "Please provide at least 24 hours notice for cancellations or rescheduling." },
   { title: "Where are you located?", content: "We are located in central London. Full address is shared in your booking confirmation." },
+];
+
+const VOICE_OPTIONS = [
+  { id: "Aria", label: "Aria", gender: "Female" },
+  { id: "Sophie", label: "Sophie", gender: "Female" },
+  { id: "Emma", label: "Emma", gender: "Female" },
+  { id: "Grace", label: "Grace", gender: "Female" },
+  { id: "James", label: "James", gender: "Male" },
+  { id: "Oliver", label: "Oliver", gender: "Male" },
+  { id: "Marcus", label: "Marcus", gender: "Male" },
+  { id: "Ethan", label: "Ethan", gender: "Male" },
 ];
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (value: boolean) => void }) {
@@ -282,7 +294,9 @@ export default function KnowledgeBase() {
                 </div>
                 <div>
                   <p className="text-xl sm:text-2xl font-semibold text-foreground">{config.name}</p>
-                  <p className="text-muted-foreground">AI Receptionist - Voice: {config.voice}</p>
+                  <p className="text-muted-foreground">
+                    AI Receptionist - Voice: {VOICE_OPTIONS.find((voice) => voice.id === config.voice)?.label || config.voice}
+                  </p>
                   <span className="mt-1 inline-flex rounded-full bg-amber-500/20 text-amber-500 px-3 py-1 text-xs font-semibold">7-day trial</span>
                 </div>
               </div>
@@ -387,10 +401,14 @@ export default function KnowledgeBase() {
               <h3 className="text-lg font-semibold text-foreground flex items-center gap-2"><Bot className="h-5 w-5 text-primary" /> AI Receptionist Name & Voice</h3>
               <div><Label className="text-xs uppercase tracking-wider mb-1.5 block">Receptionist Name</Label><Input className="max-w-xs" value={config.name} onChange={(e) => setConfig((prev) => ({ ...prev, name: e.target.value }))} /></div>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-                {["Aria", "Sophie", "Emma", "Grace", "James", "Oliver", "Marcus", "Ethan"].map((voice) => (
-                  <button key={voice} className={`rounded-xl border p-3 text-left ${config.voice === voice ? "border-primary bg-primary/15" : "border-border"}`} onClick={() => setConfig((prev) => ({ ...prev, voice }))}>
-                    <p className="font-semibold text-foreground">{voice}</p>
-                    <p className="text-xs text-muted-foreground">{["Aria", "Sophie", "Emma", "Grace"].includes(voice) ? "Female voice" : "Male voice"}</p>
+                {VOICE_OPTIONS.map((voice) => (
+                  <button
+                    key={voice.id}
+                    className={`rounded-xl border p-3 text-left ${config.voice === voice.id ? "border-primary bg-primary/15" : "border-border"}`}
+                    onClick={() => setConfig((prev) => ({ ...prev, voice: voice.id }))}
+                  >
+                    <p className="font-semibold text-foreground">{voice.label}</p>
+                    <p className="text-xs text-muted-foreground">{voice.gender} voice</p>
                   </button>
                 ))}
               </div>
@@ -477,6 +495,63 @@ export default function KnowledgeBase() {
                   <Button size="sm" variant="outline">Connect</Button>
                 </div>
               ))}
+            </div>
+
+            <div className="rounded-xl border border-border p-4 space-y-3">
+              <div>
+                <h4 className="text-sm font-semibold text-foreground">Services & Durations</h4>
+                <p className="text-xs text-muted-foreground mt-1">Set how long each service should be booked for.</p>
+              </div>
+              <div className="space-y-2">
+                {(Array.isArray(config.bookingRules.services) ? config.bookingRules.services : []).map((service: any, index: number) => (
+                  <div key={`${service?.name || "service"}-${index}`} className="grid grid-cols-1 sm:grid-cols-[1fr_140px_auto] gap-2 items-center">
+                    <Input
+                      placeholder="Service name"
+                      value={service?.name || ""}
+                      onChange={(e) => {
+                        const next = [...(Array.isArray(config.bookingRules.services) ? config.bookingRules.services : [])];
+                        next[index] = { ...next[index], name: e.target.value };
+                        setConfig((prev) => ({ ...prev, bookingRules: { ...prev.bookingRules, services: next } }));
+                      }}
+                    />
+                    <Input
+                      type="number"
+                      min={5}
+                      step={5}
+                      placeholder="Minutes"
+                      value={service?.duration ?? ""}
+                      onChange={(e) => {
+                        const next = [...(Array.isArray(config.bookingRules.services) ? config.bookingRules.services : [])];
+                        const durationValue = e.target.value === "" ? "" : Number(e.target.value);
+                        next[index] = { ...next[index], duration: durationValue };
+                        setConfig((prev) => ({ ...prev, bookingRules: { ...prev.bookingRules, services: next } }));
+                      }}
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const next = [...(Array.isArray(config.bookingRules.services) ? config.bookingRules.services : [])];
+                        next.splice(index, 1);
+                        setConfig((prev) => ({ ...prev, bookingRules: { ...prev.bookingRules, services: next } }));
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const next = [...(Array.isArray(config.bookingRules.services) ? config.bookingRules.services : [])];
+                    next.push({ name: "", duration: 30 });
+                    setConfig((prev) => ({ ...prev, bookingRules: { ...prev.bookingRules, services: next } }));
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-1" /> Add Service
+                </Button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
