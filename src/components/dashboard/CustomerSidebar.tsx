@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Bot, Phone, Calendar, BarChart3,
+  LayoutDashboard, Bot, Phone, Calendar,
   Settings, CircleHelp, LogOut, Zap, ChevronLeft, ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,6 @@ const navItems = [
   { icon: Bot, label: "My AI Receptionist", href: "/dashboard/knowledge-base" },
   { icon: Phone, label: "Calls & Recordings", href: "/dashboard/calls" },
   { icon: Calendar, label: "Bookings", href: "/dashboard/appointments" },
-  { icon: BarChart3, label: "Performance", href: "/dashboard" },
   { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   { icon: CircleHelp, label: "Get Help", href: "mailto:hello@quantumconnects.com", external: true },
 ];

@@ -186,7 +186,7 @@ export default function AppAssistantChatbot() {
         <div className="mb-3 flex flex-wrap gap-2">
           <button
             onClick={addRouteTip}
-            className="rounded-md border border-border px-2 py-1 text-xs text-foreground transition-colors hover:bg-secondary"
+            className="rounded-md border border-border px-2 py-1 text-xs text-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground"
           >
             Help on this page
           </button>
@@ -194,7 +194,7 @@ export default function AppAssistantChatbot() {
             <button
               key={q}
               onClick={() => sendUserMessage(q)}
-              className="rounded-md border border-border px-2 py-1 text-xs text-foreground transition-colors hover:bg-secondary"
+              className="rounded-md border border-border px-2 py-1 text-xs text-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground"
             >
               {q}
             </button>

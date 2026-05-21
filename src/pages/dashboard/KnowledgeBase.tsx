@@ -253,7 +253,7 @@ export default function KnowledgeBase() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h2 className="text-xl sm:text-2xl font-semibold text-foreground tracking-tight">My AI Receptionist</h2>
             <p className={`text-sm font-semibold capitalize ${config.status === "paused" ? "text-amber-500" : "text-primary"}`}>
-              Ã¢â‚¬Â¢ {config.status}
+              Status: {config.status}
             </p>
           </div>
 
@@ -282,7 +282,7 @@ export default function KnowledgeBase() {
                 </div>
                 <div>
                   <p className="text-xl sm:text-2xl font-semibold text-foreground">{config.name}</p>
-                  <p className="text-muted-foreground">AI Receptionist Ã‚Â· Voice: {config.voice}</p>
+                  <p className="text-muted-foreground">AI Receptionist - Voice: {config.voice}</p>
                   <span className="mt-1 inline-flex rounded-full bg-amber-500/20 text-amber-500 px-3 py-1 text-xs font-semibold">7-day trial</span>
                 </div>
               </div>
@@ -505,25 +505,45 @@ export default function KnowledgeBase() {
         )}
       </div>
 
-            {showScheduleModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <div className="w-full max-w-[520px] rounded-2xl border border-border bg-[#071a34] p-5 sm:p-6 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-semibold text-foreground">Agent Schedule</h3>
-              <button className="text-muted-foreground hover:text-foreground text-xl leading-none" onClick={() => setShowScheduleModal(false)}>
+      {showScheduleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4">
+          <div className="w-full max-w-[560px] rounded-2xl border border-border bg-background p-5 shadow-2xl sm:p-6">
+            <div className="flex items-start justify-between gap-3 border-b border-border pb-3">
+              <div>
+                <h3 className="text-xl font-semibold text-foreground sm:text-2xl">Agent Schedule</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Set when {config.name || "Aria"} is active and answering calls. Run 24/7 or define daily hours.
+                </p>
+              </div>
+              <button
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                onClick={() => setShowScheduleModal(false)}
+                aria-label="Close schedule modal"
+              >
                 ×
               </button>
             </div>
-            <p className="text-sm text-muted-foreground mt-2 mb-4">
-              Set when {config.name || "Aria"} is active and answering calls. Run 24/7 or define daily hours.
-            </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
-              <button onClick={() => setConfig((prev) => ({ ...prev, scheduleMode: "always_on" }))} className={`rounded-xl border p-3 text-left ${config.scheduleMode === "always_on" ? "border-primary bg-primary/15" : "border-border bg-card/40"}`}>
+            <div className="grid grid-cols-1 gap-2.5 mb-4 mt-4 sm:grid-cols-2">
+              <button
+                onClick={() => setConfig((prev) => ({ ...prev, scheduleMode: "always_on" }))}
+                className={`rounded-xl border p-3 text-left transition-colors ${
+                  config.scheduleMode === "always_on"
+                    ? "border-primary bg-primary/10"
+                    : "border-border bg-card/50 hover:bg-muted"
+                }`}
+              >
                 <p className="font-semibold text-foreground">24/7 - Always on</p>
                 <p className="text-xs text-muted-foreground">Aria answers calls any time, any day</p>
               </button>
-              <button onClick={() => setConfig((prev) => ({ ...prev, scheduleMode: "custom" }))} className={`rounded-xl border p-3 text-left ${config.scheduleMode === "custom" ? "border-primary bg-primary/15" : "border-border bg-card/40"}`}>
+              <button
+                onClick={() => setConfig((prev) => ({ ...prev, scheduleMode: "custom" }))}
+                className={`rounded-xl border p-3 text-left transition-colors ${
+                  config.scheduleMode === "custom"
+                    ? "border-primary bg-primary/10"
+                    : "border-border bg-card/50 hover:bg-muted"
+                }`}
+              >
                 <p className="font-semibold text-foreground">Custom schedule</p>
                 <p className="text-xs text-muted-foreground">Set specific days and times for Aria to be active</p>
               </button>
@@ -532,7 +552,7 @@ export default function KnowledgeBase() {
             <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Daily Schedule</p>
             <div className="space-y-2 max-h-[44vh] overflow-auto pr-1">
               {config.weeklySchedule.map((row, index) => (
-                <div key={row.day} className="rounded-lg border border-border/80 px-3 py-2.5 bg-card/20">
+                <div key={row.day} className="rounded-lg border border-border/80 bg-card/40 px-3 py-2.5">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
                     <div className="flex items-center gap-2.5">
                       <Toggle checked={row.enabled} onChange={(enabled) => {
