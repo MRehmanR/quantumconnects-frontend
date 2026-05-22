@@ -98,7 +98,7 @@ export default function IndustriesListing() {
       </section>
 
       {/* Comparison Section */}
-      <section className="py-16 md:py-24 bg-secondary">
+      <section className="py-16 md:py-24 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary">
         <div className="container">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             Common Challenges Across All Industries
@@ -137,7 +137,7 @@ export default function IndustriesListing() {
                 solution: "Instant answers and professional service",
               },
             ].map((item, index) => (
-              <Card key={index} className="p-6 border border-border">
+              <Card key={index} className="p-6 border border-border bg-white shadow-sm">
                 <div className="flex items-start gap-3 mb-4">
                   <Zap className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
                   <h3 className="text-lg font-bold text-foreground">
