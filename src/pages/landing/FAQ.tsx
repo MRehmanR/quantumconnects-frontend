@@ -110,13 +110,13 @@ export default function FAQ() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
+      <section className="py-16 md:py-24 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary">
         <div className="container">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
               Frequently Asked Questions
             </h1>
-            <p className="text-lg md:text-xl text-slate-300">
+            <p className="text-lg md:text-xl text-muted-foreground">
               Everything you need to know about Quantum Connects
             </p>
           </div>

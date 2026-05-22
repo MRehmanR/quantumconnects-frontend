@@ -65,43 +65,43 @@ export default function SourceLiveCounterV2() {
   }, []);
 
   return (
-    <section className="py-16 md:py-32 bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
+    <section className="py-16 md:py-32 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary">
       <div className="container">
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4">
+          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-3 md:mb-4">
             Real-Time Activity
           </h2>
-          <p className="text-sm md:text-lg text-slate-300">
+          <p className="text-sm md:text-lg text-muted-foreground">
             Live metrics from businesses using Quantum Connects right now
           </p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6 mb-6 md:mb-8">
-          <div className="bg-gradient-to-br from-violet-600 to-purple-600 p-1 rounded-lg md:rounded-xl">
-            <div className="bg-slate-900 rounded-lg p-3 md:p-6">
-              <p className="text-xs md:text-sm text-slate-400 font-medium mb-2 md:mb-3">
+          <div className="bg-gradient-to-br from-primary/60 to-accent/60 p-1 rounded-lg md:rounded-xl">
+            <div className="bg-white border border-border rounded-lg p-3 md:p-6 shadow-sm">
+              <p className="text-xs md:text-sm text-muted-foreground font-medium mb-2 md:mb-3">
                 Bookings Processed
               </p>
-              <p className="text-2xl md:text-4xl font-bold text-white tabular-nums">
+              <p className="text-2xl md:text-4xl font-bold text-foreground tabular-nums">
                 <SourceFlipCounter value={metrics.bookingsProcessed.toLocaleString()} />
               </p>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-orange-600 to-red-600 p-1 rounded-lg md:rounded-xl">
-            <div className="bg-slate-900 rounded-lg p-3 md:p-6">
-              <p className="text-xs md:text-sm text-slate-400 font-medium mb-2 md:mb-3">
+          <div className="bg-gradient-to-br from-accent/60 to-primary/60 p-1 rounded-lg md:rounded-xl">
+            <div className="bg-white border border-border rounded-lg p-3 md:p-6 shadow-sm">
+              <p className="text-xs md:text-sm text-muted-foreground font-medium mb-2 md:mb-3">
                 Minutes Processed
               </p>
-              <p className="text-2xl md:text-4xl font-bold text-white tabular-nums">
+              <p className="text-2xl md:text-4xl font-bold text-foreground tabular-nums">
                 <SourceFlipCounter value={metrics.minutesProcessed.toLocaleString()} />
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg md:rounded-xl border border-slate-700 p-3 md:p-6 mb-6 md:mb-8">
-          <h3 className="text-white font-semibold mb-3 md:mb-4 text-base md:text-lg">
+        <div className="bg-white rounded-lg md:rounded-xl border border-border p-3 md:p-6 mb-6 md:mb-8 shadow-sm">
+          <h3 className="text-foreground font-semibold mb-3 md:mb-4 text-base md:text-lg">
             Live Activity Feed
           </h3>
           <style>{`
@@ -125,19 +125,19 @@ export default function SourceLiveCounterV2() {
               {activities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="activity-item bg-slate-900/50 border border-slate-700 rounded-lg p-2 md:p-4 hover:border-slate-600 transition-colors"
+                  className="activity-item bg-secondary/60 border border-border rounded-lg p-2 md:p-4 hover:border-primary/40 transition-colors"
                 >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 md:gap-4">
                     <div className="flex-shrink-0">
-                      <p className="text-xs text-slate-400">Duration</p>
-                      <p className="text-sm md:text-lg font-mono font-bold text-white">
+                      <p className="text-xs text-muted-foreground">Duration</p>
+                      <p className="text-sm md:text-lg font-mono font-bold text-foreground">
                         {activity.duration}
                       </p>
                     </div>
 
                     <div className="flex-grow min-w-0">
-                      <p className="text-xs text-slate-400">Service</p>
-                      <p className="text-sm md:text-base text-white font-medium truncate">
+                      <p className="text-xs text-muted-foreground">Service</p>
+                      <p className="text-sm md:text-base text-foreground font-medium truncate">
                         {activity.service}
                       </p>
                     </div>
@@ -157,7 +157,7 @@ export default function SourceLiveCounterV2() {
         </div>
 
         <div className="mt-8 md:mt-12 text-center">
-          <p className="text-slate-400 text-xs md:text-sm">
+          <p className="text-muted-foreground text-xs md:text-sm">
             ✓ Metrics update every 5 seconds • All visitors see live data
           </p>
         </div>

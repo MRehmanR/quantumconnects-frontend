@@ -274,19 +274,19 @@ export default function Pricing() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="max-w-2xl mx-auto">
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl border-2 border-accent p-12 text-center">
+            <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-secondary rounded-2xl border border-border p-12 text-center shadow-sm">
               <div className="inline-block mb-6 px-4 py-2 bg-accent/20 rounded-full">
                 <span className="text-accent font-semibold text-sm">Premium Enterprise</span>
               </div>
               
-              <h3 className="text-3xl font-bold text-white mb-4">Bespoke</h3>
+              <h3 className="text-3xl font-bold text-foreground mb-4">Bespoke</h3>
               
-              <p className="text-slate-300 text-lg mb-8 max-w-xl mx-auto">
+              <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
                 Custom plans designed for your business needs with advanced features and dedicated support.
               </p>
 
-              <div className="bg-slate-900/50 rounded-lg p-8 mb-8 text-left">
-                <ul className="space-y-4 text-slate-200">
+              <div className="bg-white rounded-lg border border-border p-8 mb-8 text-left shadow-sm">
+                <ul className="space-y-4 text-foreground">
                   <li className="flex gap-3 items-start">
                     <CheckCircle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
                     <span>Everything in Apex</span>
