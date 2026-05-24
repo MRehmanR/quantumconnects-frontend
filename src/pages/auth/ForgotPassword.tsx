@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Zap, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,12 +11,10 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
     setMessage("");
 
     try {
@@ -30,9 +29,10 @@ export default function ForgotPassword() {
         throw new Error(payload?.message || "Failed to send reset email");
       }
 
-      setMessage("If an account exists for this email, a reset link has been sent.");
+      setMessage(`Reset link sent successfully to ${email}. Please check your inbox.`);
+      toast.success("Password reset email sent.");
     } catch (err: any) {
-      setError(err?.message || "Failed to send reset email");
+      toast.error(err?.message || "Failed to send reset email");
     } finally {
       setLoading(false);
     }
@@ -75,10 +75,6 @@ export default function ForgotPassword() {
 
             {message && (
               <p className="text-sm text-foreground bg-secondary/60 px-3 py-2 rounded-md">{message}</p>
-            )}
-
-            {error && (
-              <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">{error}</p>
             )}
 
             <Button
