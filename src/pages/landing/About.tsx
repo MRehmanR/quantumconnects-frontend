@@ -11,11 +11,11 @@ export default function About() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24">
+      <section className="relative py-12 md:py-20">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-teal-50 -z-10" />
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
               About Quantum Connects
             </h1>
             <p className="text-lg text-muted-foreground">
@@ -27,7 +27,7 @@ export default function About() {
       </section>
 
       {/* Mission Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
@@ -59,7 +59,7 @@ export default function About() {
       </section>
 
       {/* Values Section */}
-      <section className="py-16 md:py-24 bg-secondary">
+      <section className="py-12 md:py-20 bg-secondary">
         <div className="container">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             Our Core Values
@@ -109,7 +109,7 @@ export default function About() {
       </section>
 
       {/* Team Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             Built by Experts
@@ -149,7 +149,7 @@ export default function About() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 md:py-24 bg-primary text-white">
+      <section className="py-12 md:py-20 bg-primary text-white">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             {[
@@ -159,7 +159,7 @@ export default function About() {
               { number: "99.9%", label: "Uptime" },
             ].map((stat, index) => (
               <div key={index}>
-                <p className="text-4xl md:text-5xl font-bold mb-2">
+                <p className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2">
                   {stat.number}
                 </p>
                 <p className="text-blue-100">{stat.label}</p>
@@ -170,7 +170,7 @@ export default function About() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Join Our Growing Community

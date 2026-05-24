@@ -11,11 +11,11 @@ export default function Affiliates() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24">
+      <section className="relative py-12 md:py-20">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-teal-50 -z-10" />
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
               Earn Recurring Commissions
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
@@ -33,7 +33,7 @@ export default function Affiliates() {
       </section>
 
       {/* Why Join Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             Why Join Our Affiliate Program?
@@ -97,7 +97,7 @@ export default function Affiliates() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 md:py-24 bg-secondary">
+      <section className="py-12 md:py-20 bg-secondary">
         <div className="container">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             How It Works
@@ -141,7 +141,7 @@ export default function Affiliates() {
       </section>
 
       {/* Commission Examples */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             Earning Examples
@@ -191,7 +191,7 @@ export default function Affiliates() {
       </section>
 
       {/* Who Should Join */}
-      <section className="py-16 md:py-24 bg-secondary">
+      <section className="py-12 md:py-20 bg-secondary">
         <div className="container">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             Who Should Join?
@@ -218,7 +218,7 @@ export default function Affiliates() {
       </section>
 
       {/* Resources Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             Marketing Resources
@@ -265,7 +265,7 @@ export default function Affiliates() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-primary text-white">
+      <section className="py-12 md:py-20 bg-primary text-white">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Start Earning Today

@@ -202,16 +202,16 @@ export function generateRandomActivity(): LandingActivity {
 }
 
 export function getStatusColor(status: string): string {
-  if (status.includes("Completed")) return "bg-green-100 text-green-800";
+  if (status.includes("Completed")) return "bg-primary text-primary-foreground";
   if (
     status.includes("Deposit") ||
     status.includes("Collected") ||
     status.includes("Received") ||
     status.includes("Payment")
   )
-    return "bg-blue-100 text-blue-800";
+    return "bg-primary/15 text-primary border border-primary/30";
   if (status.includes("Confirmed") || status.includes("Booked") || status.includes("Scheduled"))
-    return "bg-purple-100 text-purple-800";
+    return "bg-primary/10 text-primary border border-primary/25";
   if (
     status.includes("Waitlist") ||
     status.includes("Pre-booking") ||
@@ -224,7 +224,7 @@ export function getStatusColor(status: string): string {
     status.includes("Quote") ||
     status.includes("Assessment")
   )
-    return "bg-orange-100 text-orange-800";
+    return "bg-primary/20 text-primary border border-primary/35";
 
-  return "bg-gray-100 text-gray-800";
+  return "bg-primary/10 text-primary border border-primary/20";
 }

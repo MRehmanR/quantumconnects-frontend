@@ -142,16 +142,16 @@ export default function AppAssistantChatbot() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-white shadow-lg transition-all hover:shadow-xl"
+        className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-50 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-white shadow-lg transition-all hover:shadow-xl"
         aria-label="Open app assistant"
       >
-        <MessageCircle className="h-6 w-6" />
+        <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />
       </button>
     );
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex h-[560px] w-[92vw] max-w-sm flex-col overflow-hidden rounded-xl border border-border bg-white shadow-2xl">
+    <div className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-50 flex h-[min(560px,78vh)] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-xl border border-border bg-white shadow-2xl">
       <div className="flex items-center justify-between bg-gradient-to-r from-primary to-accent px-4 py-3 text-white">
         <div>
           <p className="text-sm font-semibold">Application Assistant</p>

@@ -152,7 +152,7 @@ export default function Login() {
                 <Input
                   id="password"
                   type={showPwd ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="********"
                   className="h-10 pr-10"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -192,3 +192,4 @@ export default function Login() {
     </div>
   );
 }
+

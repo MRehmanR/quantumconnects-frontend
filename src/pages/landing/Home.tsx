@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "react-router-dom";
+import { Link } from "wouter";
 import LiveCounterV2 from "@/components/LiveCounterV2";
 
 
@@ -98,39 +98,45 @@ export default function Home() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24 overflow-hidden">
+      <section className="relative py-12 md:py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-teal-50 -z-10" />
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-foreground mb-6">
               Your AI Voice Receptionist for{" "}
               <span className="text-primary">Service Businesses</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8">
               Never miss a call again. Quantum Connects answers your business
               calls 24/7, books appointments, collects deposits, and keeps your
-              customers happy—all automatically.
+              customers happy - all automatically.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-                <Link to="/signup">
-                  Start Free Trial
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link to="/book-demo">Schedule a Demo</Link>
-              </Button>
+              <Link href="/signup">
+                <a>
+                  <Button size="lg" className="bg-primary hover:bg-primary/90">
+                    Start Free Trial
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </a>
+              </Link>
+              <Link href="/book-demo">
+                <a>
+                  <Button size="lg" variant="outline">
+                    Schedule a Demo
+                  </Button>
+                </a>
+              </Link>
             </div>
             <p className="text-sm text-muted-foreground">
-              ✓ 7 days free • No credit card required • Cancel anytime
+              7 days free | No credit card required | Cancel anytime
             </p>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -165,7 +171,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 md:py-24 bg-muted/40">
+      <section id="how-it-works" className="py-12 md:py-20 bg-muted/40">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -227,7 +233,7 @@ export default function Home() {
       <ReviewsCarousel />
 
       {/* Why Choose Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-primary/5 to-accent/5">
+      <section className="py-12 md:py-20 bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="container">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 text-center">
@@ -278,7 +284,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-primary text-white">
+      <section className="py-12 md:py-20 bg-primary text-white">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Transform Your Business?
@@ -287,17 +293,27 @@ export default function Home() {
             Join hundreds of service businesses already using Quantum Connects
             to never miss a call again.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button asChild size="lg" className="bg-white text-primary hover:bg-blue-50">
-              <Link to="/book-demo">
+          <Link href="/book-demo">
+            <a>
+              <Button
+                size="lg"
+                className="bg-white text-primary hover:bg-blue-50 mr-4"
+              >
                 Schedule a Demo
                 <ArrowRight className="ml-2 w-4 h-4" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" className="bg-transparent text-white border-2 border-white hover:bg-white/10">
-              <Link to="/signup">Start Your Free Trial</Link>
-            </Button>
-          </div>
+              </Button>
+            </a>
+          </Link>
+          <Link href="/">
+            <a>
+              <Button
+                size="lg"
+                className="bg-transparent text-white border-2 border-white hover:bg-white/10"
+              >
+                Start Your Free Trial
+              </Button>
+            </a>
+          </Link>
           <p className="text-sm text-blue-100 mt-4">
             7 days free • No credit card required • Cancel anytime
           </p>
@@ -308,3 +324,4 @@ export default function Home() {
     </div>
   );
 }
+

@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+type PerformanceRange = "weekly" | "monthly" | "custom";
+
 const mockDailyPerformance: DashboardOverviewData["dailyPerformance"] = [
   { date: "Mon", calls: 12, bookings: 4, revenue: 180 },
   { date: "Tue", calls: 18, bookings: 6, revenue: 320 },
@@ -48,6 +50,11 @@ export default function DashboardOverview() {
   const todayDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
     now.getDate()
   ).padStart(2, "0")}`;
+  const weeklyStart = new Date(now);
+  weeklyStart.setDate(now.getDate() - 6);
+  const weeklyStartDate = `${weeklyStart.getFullYear()}-${String(weeklyStart.getMonth() + 1).padStart(2, "0")}-${String(
+    weeklyStart.getDate()
+  ).padStart(2, "0")}`;
   const [overview, setOverview] = useState<DashboardOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<DailySummaryData | null>(null);
@@ -55,21 +62,36 @@ export default function DashboardOverview() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState("");
   const [summaryDate, setSummaryDate] = useState(todayDate);
+  const [performanceRange, setPerformanceRange] = useState<PerformanceRange>("weekly");
+  const [customStartDate, setCustomStartDate] = useState(weeklyStartDate);
+  const [customEndDate, setCustomEndDate] = useState(todayDate);
 
   useEffect(() => {
     const run = async () => {
+      setLoading(true);
       try {
-        const data = await dashboardApi.getOverview();
+        const query =
+          performanceRange === "custom"
+            ? { range: "custom" as const, startDate: customStartDate, endDate: customEndDate }
+            : { range: performanceRange as "weekly" | "monthly" };
+
+        if (performanceRange === "custom" && (!customStartDate || !customEndDate || customStartDate > customEndDate)) {
+          return;
+        }
+
+        const data = await dashboardApi.getOverview(query);
         setOverview(data);
         localStorage.setItem("qc_calls_used", String(data.callsUsed || 0));
         localStorage.setItem("qc_calls_limit", String((data.callsUsed || 0) + (data.callsRemaining || 0)));
+      } catch {
+        setOverview(null);
       } finally {
         setLoading(false);
       }
     };
 
     run();
-  }, []);
+  }, [customEndDate, customStartDate, performanceRange]);
 
   useEffect(() => {
     const run = async () => {
@@ -175,7 +197,45 @@ export default function DashboardOverview() {
                 <h3 className="text-sm font-semibold text-foreground">Performance Overview</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">Daily calls, bookings, and revenue trend</p>
               </div>
-              <span className="status-badge status-active">This week</span>
+              <div className="flex items-center gap-2">
+                <select
+                  value={performanceRange}
+                  onChange={(e) => setPerformanceRange(e.target.value as PerformanceRange)}
+                  className="h-8 rounded-md border border-border bg-background px-2 text-xs text-foreground"
+                >
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+            </div>
+            {performanceRange === "custom" && (
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+                <Input
+                  type="date"
+                  value={customStartDate}
+                  onChange={(e) => setCustomStartDate(e.target.value)}
+                  className="h-8 text-xs sm:w-[160px]"
+                  max={todayDate}
+                />
+                <Input
+                  type="date"
+                  value={customEndDate}
+                  onChange={(e) => setCustomEndDate(e.target.value)}
+                  className="h-8 text-xs sm:w-[160px]"
+                  max={todayDate}
+                />
+                <span className="text-[11px] text-muted-foreground">Select date range</span>
+              </div>
+            )}
+            <div className="mb-2">
+              <span className="status-badge status-active">
+                {performanceRange === "weekly"
+                  ? "This week"
+                  : performanceRange === "monthly"
+                    ? "Last 30 days"
+                    : "Custom range"}
+              </span>
             </div>
             <ResponsiveContainer width="100%" height={220}>
               <ComposedChart data={performanceData}>
@@ -338,17 +398,17 @@ export default function DashboardOverview() {
           transition={{ delay: 0.55 }}
           className="card-surface p-5"
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <div>
               <h3 className="text-sm font-semibold text-foreground">Daily Summary</h3>
               <p className="text-xs text-muted-foreground mt-0.5">Generate summary for today or any previous date</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex w-full sm:w-auto items-center gap-2">
               <Input
                 type="date"
                 value={summaryDate}
                 onChange={(e) => setSummaryDate(e.target.value)}
-                className="h-8 text-xs w-[150px]"
+                className="h-8 text-xs w-full sm:w-[150px]"
                 max={todayDate}
               />
               <Button type="button" size="sm" onClick={handleGenerateSummary} disabled={summaryLoading}>
@@ -363,7 +423,7 @@ export default function DashboardOverview() {
           {summaryError && <p className="text-xs text-destructive mb-3">{summaryError}</p>}
 
           {summary && (
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
               <div className="rounded-lg border border-border px-3 py-2">
                 <p className="text-[11px] text-muted-foreground">Calls</p>
                 <p className="text-lg font-semibold text-foreground">{summary.totalCalls}</p>
@@ -384,7 +444,7 @@ export default function DashboardOverview() {
                 <p className="text-[11px] text-muted-foreground">Revenue Generated</p>
                 <p className="text-lg font-semibold text-foreground">GBP {summary.revenueGenerated.toFixed(2)}</p>
               </div>
-              <div className="rounded-lg border border-border px-3 py-2 col-span-2">
+              <div className="rounded-lg border border-border px-3 py-2 sm:col-span-2 lg:col-span-1">
                 <p className="text-[11px] text-muted-foreground">Date</p>
                 <p className="text-sm font-semibold text-foreground">{summary.date}</p>
               </div>
@@ -396,7 +456,7 @@ export default function DashboardOverview() {
               <p className="text-xs font-semibold text-foreground mb-2">Saved Daily Summaries</p>
               <div className="space-y-2 max-h-44 overflow-auto pr-1">
                 {summaryHistory.map((item) => (
-                  <div key={item.date} className="rounded-lg border border-border px-3 py-2 text-xs flex items-center justify-between gap-2">
+                  <div key={item.date} className="rounded-lg border border-border px-3 py-2 text-xs grid grid-cols-1 sm:grid-cols-5 gap-1 sm:gap-2">
                     <span className="text-foreground font-medium">{item.date}</span>
                     <span className="text-muted-foreground">Calls {item.totalCalls}</span>
                     <span className="text-muted-foreground">Bookings {item.bookings}</span>

@@ -15,11 +15,11 @@ export default function IndustriesListing() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24">
+      <section className="relative py-12 md:py-20">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-teal-50 -z-10" />
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
               Quantum Connects for Your Industry
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
@@ -35,7 +35,7 @@ export default function IndustriesListing() {
       </section>
 
       {/* Industries Grid by Category */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container">
           {categories.map((category) => {
             const categoryIndustries = getIndustriesByCategory(category);
@@ -98,7 +98,7 @@ export default function IndustriesListing() {
       </section>
 
       {/* Comparison Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary">
+      <section className="py-12 md:py-20 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary">
         <div className="container">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             Common Challenges Across All Industries
@@ -157,7 +157,7 @@ export default function IndustriesListing() {
       </section>
 
       {/* Features by Industry Type */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             Industry-Specific Features
@@ -297,7 +297,7 @@ export default function IndustriesListing() {
       <TrustBadges />
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-primary text-white">
+      <section className="py-12 md:py-20 bg-primary text-white">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Transform Your Business?

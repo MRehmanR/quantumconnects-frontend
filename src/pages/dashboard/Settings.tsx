@@ -314,18 +314,18 @@ export default function Settings() {
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs text-foreground">Payment window (hours)</Label>
+                          <Label className="text-xs text-foreground">Payment window (minutes)</Label>
                           <Input
                             type="number"
-                            value={toggles.callHandling.depositCollection.paymentWindowHours}
+                            value={Math.round((toggles.callHandling.depositCollection.paymentWindowHours ?? 0) * 60)}
                             onChange={(e) => setToggles({
                               ...toggles,
                               callHandling: {
                                 ...toggles.callHandling,
-                                depositCollection: { ...toggles.callHandling.depositCollection, paymentWindowHours: Number(e.target.value) },
+                                depositCollection: { ...toggles.callHandling.depositCollection, paymentWindowHours: Number(e.target.value) / 60 },
                               },
                             })}
-                            placeholder="24"
+                            placeholder="1440"
                             className="h-8 text-xs"
                           />
                         </div>

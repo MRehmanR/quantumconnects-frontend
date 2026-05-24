@@ -9,9 +9,9 @@ import { Label } from "@/components/ui/label";
 import { normalizePhoneForSubmit } from "@/lib/phone";
 
 const PHONE_COUNTRY_CODES = [
-  { label: "Pakistan (+92)", code: "+92" },
-  { label: "United Kingdom (+44)", code: "+44" },
   { label: "United States (+1)", code: "+1" },
+  { label: "United Kingdom (+44)", code: "+44" },
+  { label: "Pakistan (+92)", code: "+92" },
   { label: "India (+91)", code: "+91" },
   { label: "UAE (+971)", code: "+971" },
   { label: "Saudi Arabia (+966)", code: "+966" },
@@ -25,6 +25,22 @@ const PHONE_COUNTRY_CODES = [
   { label: "Italy (+39)", code: "+39" },
   { label: "Spain (+34)", code: "+34" }
 ];
+
+const resolveInitialCountryCode = (stored: string | null, ownerPhone: string, inboundNumber: string) => {
+  if (stored && PHONE_COUNTRY_CODES.some((item) => item.code === stored)) {
+    return stored;
+  }
+
+  const candidates = [ownerPhone, inboundNumber].filter(Boolean);
+  for (const candidate of candidates) {
+    const match = PHONE_COUNTRY_CODES.find((item) => candidate.startsWith(item.code));
+    if (match) {
+      return match.code;
+    }
+  }
+
+  return "+1";
+};
 
 const statusConfig: Record<string, { color: string; icon: typeof CheckCircle }> = {
   Confirmed: { color: "status-completed", icon: CheckCircle },
@@ -61,7 +77,11 @@ export default function Appointments() {
   const [actionMessage, setActionMessage] = useState("");
   const [appointmentDateFilter, setAppointmentDateFilter] = useState("");
   const [phoneCountryCode, setPhoneCountryCode] = useState(
-    localStorage.getItem("qc_phone_country_code") || "+92"
+    resolveInitialCountryCode(
+      localStorage.getItem("qc_phone_country_code"),
+      ownerPhone,
+      inboundNumber
+    )
   );
 
   const loadAppointments = useCallback(async (showLoading = false) => {
@@ -99,6 +119,14 @@ export default function Appointments() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
+
+    if (form.date && form.time) {
+      const candidate = new Date(`${form.date}T${form.time}`);
+      if (!Number.isNaN(candidate.getTime()) && candidate < new Date()) {
+        setFormError("Appointment time must be in the future.");
+        return;
+      }
+    }
 
     const normalizedPhone = normalizePhoneForSubmit(form.customerPhone, phoneCountryCode);
     if (!normalizedPhone.ok) {
@@ -183,7 +211,7 @@ export default function Appointments() {
       const data = await appointmentsApi.createDepositLink(appointmentId, {
         totalAmount,
         percentage,
-        currency: "usd",
+        currency: "gbp",
       });
       if (data?.paymentUrl) {
         await navigator.clipboard.writeText(data.paymentUrl);
@@ -307,7 +335,13 @@ export default function Appointments() {
                 <Input
                   className="h-9 text-sm col-span-2"
                   value={form.customerPhone}
-                  onChange={(e) => setForm({ ...form, customerPhone: e.target.value })}
+                  inputMode="tel"
+                  pattern="[0-9+\s-]*"
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const sanitized = raw.replace(/[^0-9+\s-]/g, "");
+                    setForm({ ...form, customerPhone: sanitized });
+                  }}
                   placeholder="3001234567 or +923001234567"
                 />
               </div>
@@ -328,6 +362,7 @@ export default function Appointments() {
                 className="h-9 text-sm"
                 value={form.date}
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
+                min={new Date().toISOString().slice(0, 10)}
                 required
               />
             </div>

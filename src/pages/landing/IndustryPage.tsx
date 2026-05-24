@@ -40,11 +40,11 @@ export default function IndustryPage({
       <Header />
 
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24">
+      <section className="relative py-12 md:py-20">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-teal-50 -z-10" />
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
               {title}
             </h1>
             <p className="text-xl text-muted-foreground mb-8">{subtitle}</p>
@@ -59,7 +59,7 @@ export default function IndustryPage({
       </section>
 
       {/* Pain Point Section */}
-      <section className="py-16 md:py-24 bg-secondary">
+      <section className="py-12 md:py-20 bg-secondary">
         <div className="container max-w-3xl mx-auto">
           <div className="bg-white p-8 rounded-lg border border-border shadow-sm">
             <h2 className="text-2xl font-bold text-foreground mb-4">
@@ -72,7 +72,7 @@ export default function IndustryPage({
 
       {/* Stats Section */}
       {stats.length > 0 && (
-        <section className="py-16 md:py-24 bg-secondary">
+        <section className="py-12 md:py-20 bg-secondary">
           <div className="container">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
               By The Numbers
@@ -93,7 +93,7 @@ export default function IndustryPage({
 
       {/* Key Features Section */}
       {keyFeatures.length > 0 && (
-        <section className="py-16 md:py-24">
+        <section className="py-12 md:py-20">
           <div className="container">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
               How Quantum Connects Helps
@@ -117,7 +117,7 @@ export default function IndustryPage({
 
       {/* Testimonial Section */}
       {testimonial && (
-        <section className="py-16 md:py-24 bg-secondary">
+        <section className="py-12 md:py-20 bg-secondary">
           <div className="container max-w-3xl mx-auto">
             <div className="text-center">
               <div className="mb-6 flex justify-center gap-1">
@@ -138,7 +138,7 @@ export default function IndustryPage({
       )}
 
       {/* Features Comparison */}
-      <section className="py-16 md:py-24 bg-secondary">
+      <section className="py-12 md:py-20 bg-secondary">
         <div className="container max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             What You Get
@@ -165,7 +165,7 @@ export default function IndustryPage({
       </section>
 
       {/* Pricing Preview */}
-      <section className="py-16 md:py-24 bg-secondary">
+      <section className="py-12 md:py-20 bg-secondary">
         <div className="container max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
             Affordable Plans for Every Business
@@ -201,7 +201,7 @@ export default function IndustryPage({
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 md:py-24 bg-primary text-white">
+      <section className="py-12 md:py-20 bg-primary text-white">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Transform Your Business?

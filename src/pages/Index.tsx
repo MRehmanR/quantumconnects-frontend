@@ -66,7 +66,6 @@ export default function Index() {
     const pathToSection: Record<string, string> = {
       "/features": "features",
       "/pricing": "pricing",
-      "/contact": "pricing",
       "/book-demo": "pricing",
       "/testimonials": "reviews",
       "/faq": "pricing",
@@ -81,7 +80,10 @@ export default function Index() {
       requestAnimationFrame(() => {
         const section = document.getElementById(sectionId);
         if (section) {
-          section.scrollIntoView({ behavior: "smooth", block: "start" });
+          const header = document.querySelector('header');
+          const headerHeight = header ? header.getBoundingClientRect().height : 0;
+          const top = section.getBoundingClientRect().top + window.scrollY - headerHeight - 12;
+          window.scrollTo({ top, behavior: 'smooth' });
         }
       });
     } else {

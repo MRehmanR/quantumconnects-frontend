@@ -333,7 +333,14 @@ export type AiReceptionistConfigData = {
 };
 
 export const dashboardApi = {
-  getOverview: () => request<DashboardOverviewData>("/api/dashboard"),
+  getOverview: (params?: { range?: "weekly" | "monthly" | "custom"; startDate?: string; endDate?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.range) query.set("range", params.range);
+    if (params?.startDate) query.set("startDate", params.startDate);
+    if (params?.endDate) query.set("endDate", params.endDate);
+    const suffix = query.toString() ? `?${query.toString()}` : "";
+    return request<DashboardOverviewData>(`/api/dashboard${suffix}`);
+  },
 };
 
 export const profileApi = {

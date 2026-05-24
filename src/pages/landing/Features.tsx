@@ -119,11 +119,11 @@ export default function Features() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24">
+      <section className="relative py-12 md:py-20">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-teal-50 -z-10" />
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
               Powerful Features for Modern Service Businesses
             </h1>
             <p className="text-lg text-muted-foreground">
@@ -135,7 +135,7 @@ export default function Features() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {features.map((feature, index) => {
@@ -170,7 +170,7 @@ export default function Features() {
       </section>
 
       {/* Integration Section */}
-      <section className="py-16 md:py-24 bg-secondary">
+      <section className="py-12 md:py-20 bg-secondary">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -205,7 +205,7 @@ export default function Features() {
       </section>
 
       {/* Comparison Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-20">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -263,7 +263,7 @@ export default function Features() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-primary text-white">
+      <section className="py-12 md:py-20 bg-primary text-white">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Experience All Features Risk-Free

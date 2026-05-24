@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Menu, X } from "lucide-react";
@@ -19,6 +19,25 @@ export default function LandingNav() {
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSmoothScroll = (e: React.MouseEvent, id: string) => {
+    if (id === "how-it-works") {
+      e.preventDefault();
+      if (location.pathname === "/") {
+        const element = document.getElementById("how-it-works");
+        if (element) element.scrollIntoView({ behavior: "smooth" });
+        return;
+      }
+      navigate("/");
+      setTimeout(() => {
+        const element = document.getElementById("how-it-works");
+        if (element) element.scrollIntoView({ behavior: "smooth" });
+      }, 120);
+    }
+  };
 
   return (
     <header
@@ -43,6 +62,9 @@ export default function LandingNav() {
             <a
               key={link.label}
               href={link.href}
+              onClick={(e) => {
+                if (link.href.includes("how-it-works")) handleSmoothScroll(e, "how-it-works");
+              }}
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
@@ -87,16 +109,19 @@ export default function LandingNav() {
             className="md:hidden bg-white border-b border-border px-4 pb-4 pt-2"
           >
             <nav className="flex flex-col gap-1">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground rounded-md hover:bg-muted"
-                >
-                  {link.label}
-                </a>
-              ))}
+                {navLinks.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => {
+                      if (link.href.includes("how-it-works")) handleSmoothScroll(e, "how-it-works");
+                      setMobileOpen(false);
+                    }}
+                    className="px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground rounded-md hover:bg-muted"
+                  >
+                    {link.label}
+                  </a>
+                ))}
               <div className="mt-2 flex flex-col gap-2 border-t border-border pt-3">
                 <Link to="/login" onClick={() => setMobileOpen(false)}>
                   <Button variant="outline" size="sm" className="w-full">Sign In</Button>

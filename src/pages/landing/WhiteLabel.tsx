@@ -14,7 +14,7 @@ export default function WhiteLabel() {
           </div>
 
           {/* Heading */}
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
             White Label Solutions
           </h1>
 

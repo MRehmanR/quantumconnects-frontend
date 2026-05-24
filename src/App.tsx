@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +25,8 @@ import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import OnboardingBuyNumber from "./pages/auth/OnboardingBuyNumber";
 import OnboardingSetup from "./pages/auth/OnboardingSetup";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 // Customer Dashboard
 import DashboardOverview from "./pages/dashboard/Overview";
@@ -40,6 +43,25 @@ import AdminSubscriptions from "./pages/admin/Subscriptions";
 import AdminAnalytics from "./pages/admin/Analytics";
 
 const queryClient = new QueryClient();
+
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const id = hash.replace("#", "");
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+    }
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname, hash]);
+
+  return null;
+}
 
 function RequireAuth({ allowedRoles }: { allowedRoles: Array<"user" | "admin"> }) {
   const token = localStorage.getItem("qc_auth_token");
@@ -62,6 +84,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           {/* Landing */}
           <Route path="/" element={<Home />} />
@@ -80,6 +103,8 @@ const App = () => (
           {/* Auth */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Customer Dashboard */}
           <Route element={<RequireAuth allowedRoles={["user"]} />}>

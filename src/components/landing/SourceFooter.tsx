@@ -5,9 +5,9 @@ export default function SourceFooter() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-muted/40 border-t border-border mt-20">
-      <div className="container py-12 md:py-16 px-4 md:px-0">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+    <footer className="bg-muted/40 border-t border-border mt-12 md:mt-20">
+      <div className="container py-12 md:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center text-white font-bold">
@@ -115,9 +115,9 @@ export default function SourceFooter() {
         </div>
 
         <div className="border-t border-border pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>© {currentYear} Quantum Connects. All rights reserved.</p>
-            <div className="flex gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-sm text-muted-foreground">
+            <p>(c) {currentYear} Quantum Connects. All rights reserved.</p>
+            <div className="flex flex-wrap gap-4 md:gap-6">
               <a href="#" className="hover:text-primary transition-colors">
                 Privacy Policy
               </a>
@@ -131,3 +131,4 @@ export default function SourceFooter() {
     </footer>
   );
 }
+

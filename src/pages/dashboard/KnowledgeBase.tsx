@@ -98,6 +98,39 @@ export default function KnowledgeBase() {
 
   const [newTraining, setNewTraining] = useState({ title: "", content: "" });
   const [newFaq, setNewFaq] = useState({ question: "", answer: "" });
+  const [playingVoice, setPlayingVoice] = useState<string | null>(null);
+
+  const playVoiceSample = (voiceId: string, label: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      return;
+    }
+
+    try {
+      const synth = window.speechSynthesis;
+      const utter = new SpeechSynthesisUtterance(`Hello, this is ${label}. How can I help you today?`);
+
+      const setVoiceAndSpeak = () => {
+        const voices = synth.getVoices() || [];
+        const found = voices.find((v) => (v.name || '').toLowerCase().includes(label.toLowerCase()) || (v.name || '').toLowerCase().includes(voiceId.toLowerCase()));
+        if (found) {
+          // @ts-ignore
+          utter.voice = found;
+        }
+        setPlayingVoice(voiceId);
+        utter.onend = () => setPlayingVoice(null);
+        synth.cancel();
+        synth.speak(utter);
+      };
+
+      if (synth.getVoices().length === 0) {
+        synth.onvoiceschanged = () => setVoiceAndSpeak();
+      } else {
+        setVoiceAndSpeak();
+      }
+    } catch (err) {
+      // ignore
+    }
+  };
 
   useEffect(() => {
     const run = async () => {
@@ -311,7 +344,15 @@ export default function KnowledgeBase() {
                 {(["live", "paused", "scheduled"] as const).map((value) => (
                   <button
                     key={value}
-                    onClick={() => setConfig((prev) => ({ ...prev, status: value }))}
+                    onClick={async () => {
+                      setConfig((prev) => ({ ...prev, status: value }));
+                      try {
+                        await saveReceptionistConfig({ status: value });
+                      } catch (err) {
+                        // ignore - saveReceptionistConfig handles messaging
+                      }
+                    }}
+                    disabled={saving}
                     className={`rounded-xl border py-2 text-sm font-semibold capitalize ${
                       config.status === value
                         ? value === "paused"
@@ -402,14 +443,23 @@ export default function KnowledgeBase() {
               <div><Label className="text-xs uppercase tracking-wider mb-1.5 block">Receptionist Name</Label><Input className="max-w-xs" value={config.name} onChange={(e) => setConfig((prev) => ({ ...prev, name: e.target.value }))} /></div>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
                 {VOICE_OPTIONS.map((voice) => (
-                  <button
-                    key={voice.id}
-                    className={`rounded-xl border p-3 text-left ${config.voice === voice.id ? "border-primary bg-primary/15" : "border-border"}`}
-                    onClick={() => setConfig((prev) => ({ ...prev, voice: voice.id }))}
-                  >
-                    <p className="font-semibold text-foreground">{voice.label}</p>
-                    <p className="text-xs text-muted-foreground">{voice.gender} voice</p>
-                  </button>
+                  <div key={voice.id} className={`rounded-xl border p-3 text-left ${config.voice === voice.id ? "border-primary bg-primary/15" : "border-border"}`}>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1" onClick={() => setConfig((prev) => ({ ...prev, voice: voice.id }))}>
+                        <p className="font-semibold text-foreground">{voice.label}</p>
+                        <p className="text-xs text-muted-foreground">{voice.gender} voice</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="text-sm text-muted-foreground hover:text-foreground"
+                          onClick={() => playVoiceSample(voice.id, voice.label)}
+                          aria-label={`Play sample for ${voice.label}`}
+                        >
+                          {playingVoice === voice.id ? 'Playing...' : 'Play'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
               <div><Label className="text-xs uppercase tracking-wider mb-1.5 block">Custom Greeting</Label><Textarea rows={4} value={config.customGreeting} onChange={(e) => setConfig((prev) => ({ ...prev, customGreeting: e.target.value }))} /></div>
@@ -601,7 +651,12 @@ export default function KnowledgeBase() {
 
             <div className="grid grid-cols-1 gap-2.5 mb-4 mt-4 sm:grid-cols-2">
               <button
-                onClick={() => setConfig((prev) => ({ ...prev, scheduleMode: "always_on" }))}
+                onClick={async () => {
+                  setConfig((prev) => ({ ...prev, scheduleMode: "always_on" }));
+                  try {
+                    await saveReceptionistConfig({ scheduleMode: "always_on" });
+                  } catch (_) {}
+                }}
                 className={`rounded-xl border p-3 text-left transition-colors ${
                   config.scheduleMode === "always_on"
                     ? "border-primary bg-primary/10"
@@ -612,7 +667,12 @@ export default function KnowledgeBase() {
                 <p className="text-xs text-muted-foreground">Aria answers calls any time, any day</p>
               </button>
               <button
-                onClick={() => setConfig((prev) => ({ ...prev, scheduleMode: "custom" }))}
+                onClick={async () => {
+                  setConfig((prev) => ({ ...prev, scheduleMode: "custom" }));
+                  try {
+                    await saveReceptionistConfig({ scheduleMode: "custom" });
+                  } catch (_) {}
+                }}
                 className={`rounded-xl border p-3 text-left transition-colors ${
                   config.scheduleMode === "custom"
                     ? "border-primary bg-primary/10"

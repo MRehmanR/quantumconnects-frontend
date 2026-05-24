@@ -1,18 +1,18 @@
 import { Zap, Twitter, Linkedin, Github } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const links = {
   product: [
-    { label: "Features", href: "/#features" },
-    { label: "Pricing", href: "/#pricing" },
+    { label: "Features", href: "/features" },
+    { label: "Pricing", href: "/pricing" },
     { label: "How It Works", href: "/#how-it-works" },
     { label: "Changelog", href: "#" },
   ],
   company: [
-    { label: "About", href: "#" },
+    { label: "About", href: "/about" },
     { label: "Blog", href: "#" },
     { label: "Careers", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "Contact", href: "/contact" },
   ],
   legal: [
     { label: "Privacy Policy", href: "#" },
@@ -23,6 +23,22 @@ const links = {
 };
 
 export default function Footer() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleHowItWorks = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (location.pathname === "/") {
+      const el = document.getElementById("how-it-works");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    navigate("/");
+    setTimeout(() => {
+      const el = document.getElementById("how-it-works");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }, 120);
+  };
   return (
     <footer className="border-t border-border bg-background">
       <div className="container mx-auto px-4 py-16">
@@ -62,12 +78,19 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {items.map((item) => (
                   <li key={item.label}>
-                    <a
-                      href={item.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {item.label}
-                    </a>
+                    {item.href.startsWith("/#") ? (
+                      <a
+                        href={item.href}
+                        onClick={(e) => handleHowItWorks(e as any)}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {item.label}
+                      </a>
+                    ) : item.href.startsWith("/") ? (
+                      <Link to={item.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{item.label}</Link>
+                    ) : (
+                      <a href={item.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{item.label}</a>
+                    )}
                   </li>
                 ))}
               </ul>

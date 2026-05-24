@@ -32,6 +32,16 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState("");
   const [error, setError] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordChecks, setPasswordChecks] = useState({
+    length: false,
+    uppercase: false,
+    number: false,
+    special: false,
+  });
+
+  const passwordValid =
+    passwordChecks.length && passwordChecks.uppercase && passwordChecks.number && passwordChecks.special;
 
   useEffect(() => {
     const ref = searchParams.get("ref");
@@ -41,6 +51,16 @@ export default function Signup() {
   }, [searchParams]);
 
   const update = (field: string, value: string) => setForm({ ...form, [field]: value });
+
+  const runPasswordChecks = (pw: string) => {
+    const checks = {
+      length: pw.length >= 8,
+      uppercase: /[A-Z]/.test(pw),
+      number: /[0-9]/.test(pw),
+      special: /[^A-Za-z0-9]/.test(pw),
+    };
+    setPasswordChecks(checks);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -350,7 +370,10 @@ export default function Signup() {
                   placeholder="Min. 8 characters"
                   className="h-10 pr-10"
                   value={form.password}
-                  onChange={(e) => update("password", e.target.value)}
+                  onChange={(e) => {
+                    update("password", e.target.value);
+                    runPasswordChecks(e.target.value);
+                  }}
                   minLength={8}
                   required
                 />
@@ -364,13 +387,61 @@ export default function Signup() {
               </div>
             </div>
 
+            <div className="text-sm text-muted-foreground mt-1">
+              <div className="flex items-center gap-2">
+                <Check className={`h-4 w-4 ${passwordChecks.length ? 'text-accent' : 'text-muted-foreground'}`} />
+                <span>At least 8 characters</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <Check className={`h-4 w-4 ${passwordChecks.uppercase ? 'text-accent' : 'text-muted-foreground'}`} />
+                <span>At least 1 uppercase letter</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <Check className={`h-4 w-4 ${passwordChecks.number ? 'text-accent' : 'text-muted-foreground'}`} />
+                <span>At least 1 number</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <Check className={`h-4 w-4 ${passwordChecks.special ? 'text-accent' : 'text-muted-foreground'}`} />
+                <span>At least 1 special character</span>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm password</Label>
+              <div className="relative mt-1.5">
+                <Input
+                  id="confirmPassword"
+                  type={showPwd ? "text" : "password"}
+                  placeholder="Re-enter password"
+                  className="h-10 pr-10"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {confirmPassword && (
+                    <span className={`${form.password === confirmPassword ? 'text-accent' : 'text-destructive'}`}>
+                      {form.password === confirmPassword ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                      )}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {confirmPassword && form.password !== confirmPassword && (
+                <p className="text-xs text-destructive mt-2">Passwords do not match</p>
+              )}
+            </div>
+
             {error && (
               <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">{error}</p>
             )}
 
             <Button
               type="submit"
-              disabled={loading}
+              disabled={loading || !passwordValid || form.password !== confirmPassword}
               className="w-full h-10 bg-gradient-primary hover:opacity-90 text-primary-foreground font-semibold"
             >
               {loading ? (

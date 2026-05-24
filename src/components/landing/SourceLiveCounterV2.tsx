@@ -65,7 +65,7 @@ export default function SourceLiveCounterV2() {
   }, []);
 
   return (
-    <section className="py-16 md:py-32 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary">
+    <section className="py-16 md:py-32 bg-gradient-to-b from-primary/5 via-white to-primary/10">
       <div className="container">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-3 md:mb-4">
@@ -77,8 +77,8 @@ export default function SourceLiveCounterV2() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6 mb-6 md:mb-8">
-          <div className="bg-gradient-to-br from-primary/60 to-accent/60 p-1 rounded-lg md:rounded-xl">
-            <div className="bg-white border border-border rounded-lg p-3 md:p-6 shadow-sm">
+          <div className="bg-gradient-to-br from-primary/30 to-primary/10 p-1 rounded-lg md:rounded-xl">
+            <div className="bg-white border border-primary/20 rounded-lg p-3 md:p-6 shadow-sm">
               <p className="text-xs md:text-sm text-muted-foreground font-medium mb-2 md:mb-3">
                 Bookings Processed
               </p>
@@ -88,8 +88,8 @@ export default function SourceLiveCounterV2() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-accent/60 to-primary/60 p-1 rounded-lg md:rounded-xl">
-            <div className="bg-white border border-border rounded-lg p-3 md:p-6 shadow-sm">
+          <div className="bg-gradient-to-br from-primary/30 to-primary/10 p-1 rounded-lg md:rounded-xl">
+            <div className="bg-white border border-primary/20 rounded-lg p-3 md:p-6 shadow-sm">
               <p className="text-xs md:text-sm text-muted-foreground font-medium mb-2 md:mb-3">
                 Minutes Processed
               </p>
@@ -100,8 +100,8 @@ export default function SourceLiveCounterV2() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg md:rounded-xl border border-border p-3 md:p-6 mb-6 md:mb-8 shadow-sm">
-          <h3 className="text-foreground font-semibold mb-3 md:mb-4 text-base md:text-lg">
+        <div className="bg-white rounded-lg md:rounded-xl border border-primary/20 p-3 md:p-6 mb-6 md:mb-8 shadow-sm">
+          <h3 className="text-primary font-semibold mb-3 md:mb-4 text-base md:text-lg">
             Live Activity Feed
           </h3>
           <style>{`
@@ -125,7 +125,7 @@ export default function SourceLiveCounterV2() {
               {activities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="activity-item bg-secondary/60 border border-border rounded-lg p-2 md:p-4 hover:border-primary/40 transition-colors"
+                  className="activity-item bg-primary/5 border border-primary/20 rounded-lg p-2 md:p-4 hover:border-primary/40 transition-colors"
                 >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 md:gap-4">
                     <div className="flex-shrink-0">
@@ -158,7 +158,7 @@ export default function SourceLiveCounterV2() {
 
         <div className="mt-8 md:mt-12 text-center">
           <p className="text-muted-foreground text-xs md:text-sm">
-            ✓ Metrics update every 5 seconds • All visitors see live data
+            Metrics update every 5 seconds | All visitors see live data
           </p>
         </div>
       </div>

@@ -98,7 +98,7 @@ export default function DashboardShell({ children }: DashboardShellProps) {
           <div className="hidden sm:block text-right mr-1">
             <p className="text-xs font-medium text-foreground leading-tight">{userName}</p>
             <p className="text-[11px] text-muted-foreground leading-tight">
-              {[userEmail, ownerPhone].filter(Boolean).join(" · ")}
+              {[userEmail, ownerPhone].filter(Boolean).join(" | ")}
             </p>
           </div>
 
@@ -113,3 +113,4 @@ export default function DashboardShell({ children }: DashboardShellProps) {
     </div>
   );
 }
+

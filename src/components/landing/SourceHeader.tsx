@@ -1,34 +1,42 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function SourceHeader() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const handleSmoothScroll = (e: React.MouseEvent, id: string) => {
     if (id === "how-it-works") {
       e.preventDefault();
-      const element = document.getElementById("how-it-works");
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+      if (pathname === "/") {
+        const element = document.getElementById("how-it-works");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+          return;
+        }
       }
+
+      navigate("/#how-it-works");
+      setIsOpen(false);
     }
   };
 
   const navLinks = [
-    { label: "How it Works", href: "#how-it-works", isScroll: true },
+    { label: "How it Works", href: "/#how-it-works", isScroll: true },
     { label: "Industries", href: "/industries" },
     { label: "Pricing", href: "/pricing" },
     { label: "Contact", href: "/contact" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-border shadow-sm">
-      <div className="container flex items-center justify-between h-16 md:h-20 px-4 md:px-0">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-border shadow-sm">
+      <div className="container flex items-center justify-between h-16 md:h-20">
         <Link
           to="/"
-          className="flex items-center gap-2 font-bold text-xl text-primary hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 font-bold text-lg sm:text-xl text-primary hover:opacity-80 transition-opacity"
         >
           <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center text-white font-bold">
             Q
@@ -36,7 +44,7 @@ export default function SourceHeader() {
           <span className="hidden sm:inline">Quantum Connects</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6 lg:gap-8">
           {navLinks.map((link) => {
             if (link.isScroll) {
               return (
@@ -77,7 +85,7 @@ export default function SourceHeader() {
         </div>
 
         <button
-          className="md:hidden p-2 hover:bg-secondary rounded-lg transition-colors"
+          className="md:hidden h-10 w-10 inline-flex items-center justify-center hover:bg-secondary rounded-lg transition-colors"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
         >
@@ -87,7 +95,7 @@ export default function SourceHeader() {
 
       {isOpen && (
         <div className="md:hidden border-t border-border bg-white">
-          <nav className="container py-4 px-4 md:px-0 flex flex-col gap-3">
+          <nav className="container py-4 flex flex-col gap-3">
             {navLinks.map((link) => {
               if (link.isScroll) {
                 return (
