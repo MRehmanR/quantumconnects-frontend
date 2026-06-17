@@ -99,6 +99,12 @@ export type ProfileData = {
   retellAgentId: string;
   provisioningStatus: "pending" | "in_progress" | "active" | "failed" | "manual_required";
   provisioningError: string;
+  demoNumber?: {
+    id: number;
+    phoneNumber: string;
+    status: "assigned" | "promoted" | "available" | "expired";
+    expiresAt: string | null;
+  } | null;
 };
 
 export type ProvisionNumberData = {
@@ -115,6 +121,15 @@ export type ProvisionNumberData = {
     skipped?: boolean;
     reason?: string;
   };
+};
+
+export type DemoNumberAssignment = {
+  demoId: number;
+  phoneNumber: string;
+  expiresAt: string | null;
+  status: "assigned" | "promoted" | "available" | "expired";
+  provider: string;
+  providerNumberId: string;
 };
 
 export type AvailableBusinessNumberItem = {
@@ -310,6 +325,19 @@ export const authApi = {
     request<ProvisionNumberData>("/api/auth/provision-retell-agent", { method: "POST", body: JSON.stringify(data || {}) }),
   generateRetellPrompt: (data?: { businessName?: string; ownerName?: string; ownerPhone?: string; userInstructions?: string }) =>
     request<GeneratedRetellPromptData>("/api/auth/generate-retell-prompt", { method: "POST", body: JSON.stringify(data || {}) }),
+  importWebsiteKnowledge: (data: { websiteUrl: string }) =>
+    request<{ imported: boolean; source?: string; error?: string; skipped?: boolean; reason?: string }>(
+      "/api/auth/import-website-knowledge",
+      { method: "POST", body: JSON.stringify(data) }
+    ),
+};
+
+export const numbersApi = {
+  assignDemoNumber: (data?: { region?: string; voicePreferences?: Record<string, any>; ttlHours?: number }) =>
+    request<DemoNumberAssignment>("/api/numbers/assign-demo", { method: "POST", body: JSON.stringify(data || {}) }),
+  promoteDemoNumber: (data: { demoId: number; paymentId?: string }) =>
+    request<DemoNumberAssignment>("/api/numbers/promote", { method: "POST", body: JSON.stringify(data) }),
+  getActiveDemoNumber: () => request<DemoNumberAssignment | null>("/api/numbers/active-demo"),
 };
 
 export type AiReceptionistScheduleRow = {

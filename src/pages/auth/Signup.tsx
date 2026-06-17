@@ -5,6 +5,7 @@ import { Zap, Eye, EyeOff, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { numbersApi } from "@/lib/api";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -152,33 +153,24 @@ export default function Signup() {
         }).catch(() => null);
       }
 
-      setLoadingStep("Assigning business number...");
-      const provisionRes = await fetch("/api/auth/provision-number", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
-          country: form.country,
-          autoAssign: true,
-          skipRetell: true,
-        }),
+      setLoadingStep("Assigning demo number...");
+      const demo = await numbersApi.assignDemoNumber({
+        region: form.country,
       });
 
-      const provisionPayload = await provisionRes.json().catch(() => null);
-      if (!provisionRes.ok) {
-        throw new Error(provisionPayload?.message || "Failed to auto-assign business number");
+      if (demo?.phoneNumber) {
+        localStorage.setItem("qc_inbound_number", demo.phoneNumber);
       }
-
-      if (provisionPayload?.data?.inboundNumber) {
-        localStorage.setItem("qc_inbound_number", provisionPayload.data.inboundNumber);
+      if (demo?.demoId) {
+        localStorage.setItem("qc_demo_number_id", String(demo.demoId));
       }
-      if (provisionPayload?.data?.retellAgentId) {
-        localStorage.setItem("qc_retell_agent_id", provisionPayload.data.retellAgentId);
+      if (demo?.expiresAt) {
+        localStorage.setItem("qc_demo_expires_at", demo.expiresAt);
+      } else {
+        localStorage.removeItem("qc_demo_expires_at");
       }
-      if (provisionPayload?.data?.provisioningStatus) {
-        localStorage.setItem("qc_provisioning_status", provisionPayload.data.provisioningStatus);
+      if (demo?.status) {
+        localStorage.setItem("qc_demo_status", demo.status);
       }
 
       setLoadingStep("Setting up voice agent...");

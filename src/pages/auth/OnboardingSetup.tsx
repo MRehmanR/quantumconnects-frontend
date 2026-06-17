@@ -4,7 +4,7 @@ import { Bot, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authApi } from "@/lib/api";
+import { authApi, numbersApi } from "@/lib/api";
 
 const COUNTRY_OPTIONS = [
   { code: "US", label: "United States (US)" },
@@ -64,26 +64,42 @@ export default function OnboardingSetup() {
       localStorage.setItem("qc_onboarding_country", country);
       localStorage.setItem("qc_business_website", websiteUrl.trim());
 
+      const trimmedWebsite = websiteUrl.trim();
+      if (trimmedWebsite) {
+        await authApi.importWebsiteKnowledge({ websiteUrl: trimmedWebsite }).catch(() => null);
+      }
+
       setStep("number");
-      const data = await authApi.provisionBusinessNumber({
-        country,
-        customPrompt: promptValue || undefined,
-        websiteUrl: websiteUrl.trim() || undefined,
+      const demo = await numbersApi.assignDemoNumber({
+        region: country,
       });
 
-      if (data?.inboundNumber) {
-        localStorage.setItem("qc_inbound_number", data.inboundNumber);
+      if (demo?.phoneNumber) {
+        localStorage.setItem("qc_inbound_number", demo.phoneNumber);
       }
-      if (data?.retellAgentId) {
-        localStorage.setItem("qc_retell_agent_id", data.retellAgentId);
+      if (demo?.demoId) {
+        localStorage.setItem("qc_demo_number_id", String(demo.demoId));
+      }
+      if (demo?.expiresAt) {
+        localStorage.setItem("qc_demo_expires_at", demo.expiresAt);
+      } else {
+        localStorage.removeItem("qc_demo_expires_at");
+      }
+      if (demo?.status) {
+        localStorage.setItem("qc_demo_status", demo.status);
+      }
+
+      const retell = await authApi.provisionRetellVoiceAgent({
+        customPrompt: promptValue || undefined,
+      });
+
+      if (retell?.retellAgentId) {
+        localStorage.setItem("qc_retell_agent_id", retell.retellAgentId);
       } else {
         localStorage.removeItem("qc_retell_agent_id");
       }
-      if (data?.provisioningStatus) {
-        localStorage.setItem("qc_provisioning_status", data.provisioningStatus);
-      }
-      if (data?.websiteKnowledgeBase?.error) {
-        setError(`Setup completed, but website import failed: ${data.websiteKnowledgeBase.error}`);
+      if (retell?.provisioningStatus) {
+        localStorage.setItem("qc_provisioning_status", retell.provisioningStatus);
       }
 
       setStep("done");
