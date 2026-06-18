@@ -5,7 +5,7 @@ import { Zap, Eye, EyeOff, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authApi, numbersApi } from "@/lib/api";
+import { authApi } from "@/lib/api";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -135,29 +135,8 @@ export default function Signup() {
         await authApi.importWebsiteKnowledge({ websiteUrl }).catch(() => null);
       }
 
-      if (!payloadData?.inboundNumber) {
-        setLoadingStep("Assigning demo number...");
-        const demo = await numbersApi.assignDemoNumber({
-          region: form.country,
-        }).catch((demoError: any) => {
-          localStorage.setItem("qc_onboarding_error", demoError?.message || "Demo number assignment needs attention.");
-          return null;
-        });
-
-        if (demo?.phoneNumber) {
-          localStorage.setItem("qc_inbound_number", demo.phoneNumber);
-        }
-        if (demo?.demoId) {
-          localStorage.setItem("qc_demo_number_id", String(demo.demoId));
-        }
-        if (demo?.expiresAt) {
-          localStorage.setItem("qc_demo_expires_at", demo.expiresAt);
-        } else {
-          localStorage.removeItem("qc_demo_expires_at");
-        }
-        if (demo?.status) {
-          localStorage.setItem("qc_demo_status", demo.status);
-        }
+      if (!payloadData?.inboundNumber && payloadData?.provisioningError) {
+        localStorage.setItem("qc_onboarding_error", payloadData.provisioningError);
       }
 
       if (!payloadData?.retellAgentId && localStorage.getItem("qc_inbound_number")) {

@@ -131,6 +131,7 @@ export default function DashboardOverview() {
   const performanceData = (overview?.dailyPerformance || []).length > 0
     ? overview?.dailyPerformance || []
     : mockDailyPerformance;
+  const businessNumber = overview?.businessNumber || localStorage.getItem("qc_inbound_number") || "";
 
   const stats = useMemo(
     () => [
@@ -366,9 +367,19 @@ export default function DashboardOverview() {
                 <Phone className="h-3.5 w-3.5" />
                 Business Number
               </div>
-              <p className="text-sm font-semibold text-foreground mt-1">
-                {overview?.businessNumber || localStorage.getItem("qc_inbound_number") || "Not set"}
-              </p>
+              <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm font-semibold text-foreground">
+                  {businessNumber || "Not set"}
+                </p>
+                {businessNumber && (
+                  <Button asChild size="sm" variant="outline" className="h-8 text-xs">
+                    <a href={`tel:${businessNumber}`}>
+                      <Phone className="mr-1.5 h-3.5 w-3.5" />
+                      Test Call
+                    </a>
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
