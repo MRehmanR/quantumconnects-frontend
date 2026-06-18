@@ -299,7 +299,16 @@ const getOwnerContext = () => ({
 export const authApi = {
   login: (data: { email: string; password: string }) =>
     request("/api/auth/login", { method: "POST", body: JSON.stringify(data) }),
-  signup: (data: { name: string; email: string; password: string; businessName: string; phone: string }) =>
+  signup: (data: {
+    name: string;
+    email: string;
+    password: string;
+    businessName: string;
+    phone?: string;
+    country?: string;
+    referralCode?: string;
+    referralMethod?: string;
+  }) =>
     request("/api/auth/register", {
       method: "POST",
       body: JSON.stringify({
@@ -307,7 +316,11 @@ export const authApi = {
         email: data.email,
         password: data.password,
         businessName: data.businessName,
-        ownerPhone: data.phone,
+        ownerPhone: data.phone || "",
+        country: data.country,
+        countryCode: data.country,
+        referralCode: data.referralCode,
+        referralMethod: data.referralMethod,
       }),
     }),
   getAvailableBusinessNumbers: (params?: { country?: string; areaCode?: string; contains?: string; limit?: number }) => {

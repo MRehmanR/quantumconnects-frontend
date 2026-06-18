@@ -5,7 +5,7 @@ import { Zap, Eye, EyeOff, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { numbersApi } from "@/lib/api";
+import { authApi, numbersApi } from "@/lib/api";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -70,66 +70,57 @@ export default function Signup() {
     setLoadingStep("Creating account...");
     localStorage.removeItem("qc_inbound_number");
     try {
-      // POST /api/auth/signup
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: form.name,
-          email: form.email,
-          password: form.password,
-          businessName: form.businessName,
-          referralCode: form.referralCode,
-          referralMethod: searchParams.get("ref") ? "link" : form.referralCode ? "code" : "",
-        }),
+      const payloadData: any = await authApi.signup({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        businessName: form.businessName,
+        country: form.country,
+        referralCode: form.referralCode,
+        referralMethod: searchParams.get("ref") ? "link" : form.referralCode ? "code" : "",
       });
 
-      const payload = await res.json().catch(() => null);
-      if (!res.ok) {
-        throw new Error(payload?.message || "Signup failed");
+      if (payloadData?.email) {
+        localStorage.setItem("qc_user_email", payloadData.email);
       }
-
-      if (payload?.data?.email) {
-        localStorage.setItem("qc_user_email", payload.data.email);
+      if (payloadData?.token) {
+        localStorage.setItem("qc_auth_token", payloadData.token);
       }
-      if (payload?.data?.token) {
-        localStorage.setItem("qc_auth_token", payload.data.token);
+      if (payloadData?.role) {
+        localStorage.setItem("qc_user_role", payloadData.role);
       }
-      if (payload?.data?.role) {
-        localStorage.setItem("qc_user_role", payload.data.role);
+      if (payloadData?.username) {
+        localStorage.setItem("qc_user_name", payloadData.username);
       }
-      if (payload?.data?.username) {
-        localStorage.setItem("qc_user_name", payload.data.username);
+      if (payloadData?.businessName) {
+        localStorage.setItem("qc_business_name", payloadData.businessName);
       }
-      if (payload?.data?.businessName) {
-        localStorage.setItem("qc_business_name", payload.data.businessName);
+      if (payloadData?.ownerPhone) {
+        localStorage.setItem("qc_owner_phone", payloadData.ownerPhone);
       }
-      if (payload?.data?.ownerPhone) {
-        localStorage.setItem("qc_owner_phone", payload.data.ownerPhone);
-      }
-      if (payload?.data?.inboundNumber) {
-        localStorage.setItem("qc_inbound_number", payload.data.inboundNumber);
+      if (payloadData?.inboundNumber) {
+        localStorage.setItem("qc_inbound_number", payloadData.inboundNumber);
       } else {
         localStorage.removeItem("qc_inbound_number");
       }
-      if (payload?.data?.retellAgentId) {
-        localStorage.setItem("qc_retell_agent_id", payload.data.retellAgentId);
+      if (payloadData?.retellAgentId) {
+        localStorage.setItem("qc_retell_agent_id", payloadData.retellAgentId);
       } else {
         localStorage.removeItem("qc_retell_agent_id");
       }
-      if (payload?.data?.provisioningStatus) {
-        localStorage.setItem("qc_provisioning_status", payload.data.provisioningStatus);
+      if (payloadData?.provisioningStatus) {
+        localStorage.setItem("qc_provisioning_status", payloadData.provisioningStatus);
       } else {
         localStorage.removeItem("qc_provisioning_status");
       }
-      if (payload?.data?.timezone) {
-        localStorage.setItem("qc_user_timezone", payload.data.timezone);
+      if (payloadData?.timezone) {
+        localStorage.setItem("qc_user_timezone", payloadData.timezone);
       }
-      if (payload?.data?.referralCode) {
-        localStorage.setItem("qc_referral_code", payload.data.referralCode);
+      if (payloadData?.referralCode) {
+        localStorage.setItem("qc_referral_code", payloadData.referralCode);
       }
 
-      const authToken = payload?.data?.token;
+      const authToken = payloadData?.token;
       if (!authToken) {
         throw new Error("Signup succeeded but auth token is missing.");
       }
@@ -141,58 +132,44 @@ export default function Signup() {
 
       if (websiteUrl) {
         setLoadingStep("Extracting website data...");
-        await fetch("/api/auth/import-website-knowledge", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify({
-            websiteUrl,
-          }),
-        }).catch(() => null);
+        await authApi.importWebsiteKnowledge({ websiteUrl }).catch(() => null);
       }
 
-      setLoadingStep("Assigning demo number...");
-      const demo = await numbersApi.assignDemoNumber({
-        region: form.country,
-      });
+      if (!payloadData?.inboundNumber) {
+        setLoadingStep("Assigning demo number...");
+        const demo = await numbersApi.assignDemoNumber({
+          region: form.country,
+        });
 
-      if (demo?.phoneNumber) {
-        localStorage.setItem("qc_inbound_number", demo.phoneNumber);
-      }
-      if (demo?.demoId) {
-        localStorage.setItem("qc_demo_number_id", String(demo.demoId));
-      }
-      if (demo?.expiresAt) {
-        localStorage.setItem("qc_demo_expires_at", demo.expiresAt);
-      } else {
-        localStorage.removeItem("qc_demo_expires_at");
-      }
-      if (demo?.status) {
-        localStorage.setItem("qc_demo_status", demo.status);
-      }
-
-      setLoadingStep("Setting up voice agent...");
-      const retellRes = await fetch("/api/auth/provision-retell-agent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({}),
-      });
-
-      const retellPayload = await retellRes.json().catch(() => null);
-      if (!retellRes.ok) {
-        throw new Error(retellPayload?.message || "Failed to setup voice agent");
+        if (demo?.phoneNumber) {
+          localStorage.setItem("qc_inbound_number", demo.phoneNumber);
+        }
+        if (demo?.demoId) {
+          localStorage.setItem("qc_demo_number_id", String(demo.demoId));
+        }
+        if (demo?.expiresAt) {
+          localStorage.setItem("qc_demo_expires_at", demo.expiresAt);
+        } else {
+          localStorage.removeItem("qc_demo_expires_at");
+        }
+        if (demo?.status) {
+          localStorage.setItem("qc_demo_status", demo.status);
+        }
       }
 
-      if (retellPayload?.data?.retellAgentId) {
-        localStorage.setItem("qc_retell_agent_id", retellPayload.data.retellAgentId);
-      }
-      if (retellPayload?.data?.provisioningStatus) {
-        localStorage.setItem("qc_provisioning_status", retellPayload.data.provisioningStatus);
+      if (!payloadData?.retellAgentId && localStorage.getItem("qc_inbound_number")) {
+        setLoadingStep("Setting up voice agent...");
+        try {
+          const retell = await authApi.provisionRetellVoiceAgent();
+          if (retell?.retellAgentId) {
+            localStorage.setItem("qc_retell_agent_id", retell.retellAgentId);
+          }
+          if (retell?.provisioningStatus) {
+            localStorage.setItem("qc_provisioning_status", retell.provisioningStatus);
+          }
+        } catch (retellError: any) {
+          localStorage.setItem("qc_onboarding_error", retellError?.message || "Voice agent setup needs attention.");
+        }
       }
 
       setLoadingStep("Finalizing dashboard...");
