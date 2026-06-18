@@ -72,6 +72,9 @@ export default function OnboardingSetup() {
       setStep("number");
       const demo = await numbersApi.assignDemoNumber({
         region: country,
+      }).catch((demoError: any) => {
+        localStorage.setItem("qc_onboarding_error", demoError?.message || "Demo number assignment needs attention.");
+        return null;
       });
 
       if (demo?.phoneNumber) {
@@ -87,6 +90,12 @@ export default function OnboardingSetup() {
       }
       if (demo?.status) {
         localStorage.setItem("qc_demo_status", demo.status);
+      }
+
+      if (!localStorage.getItem("qc_inbound_number")) {
+        setStep("done");
+        navigate("/dashboard");
+        return;
       }
 
       const retell = await authApi.provisionRetellVoiceAgent({

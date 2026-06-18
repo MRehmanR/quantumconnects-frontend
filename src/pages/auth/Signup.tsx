@@ -139,6 +139,9 @@ export default function Signup() {
         setLoadingStep("Assigning demo number...");
         const demo = await numbersApi.assignDemoNumber({
           region: form.country,
+        }).catch((demoError: any) => {
+          localStorage.setItem("qc_onboarding_error", demoError?.message || "Demo number assignment needs attention.");
+          return null;
         });
 
         if (demo?.phoneNumber) {

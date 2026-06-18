@@ -347,10 +347,10 @@ export const authApi = {
 
 export const numbersApi = {
   assignDemoNumber: (data?: { region?: string; voicePreferences?: Record<string, any>; ttlHours?: number }) =>
-    request<DemoNumberAssignment>("/api/numbers/assign-demo", { method: "POST", body: JSON.stringify(data || {}) }),
+    request<DemoNumberAssignment>("/api/auth/assign-demo", { method: "POST", body: JSON.stringify(data || {}) }),
   promoteDemoNumber: (data: { demoId: number; paymentId?: string }) =>
     request<DemoNumberAssignment>("/api/numbers/promote", { method: "POST", body: JSON.stringify(data) }),
-  getActiveDemoNumber: () => request<DemoNumberAssignment | null>("/api/numbers/active-demo"),
+  getActiveDemoNumber: () => request<DemoNumberAssignment | null>("/api/auth/active-demo"),
 };
 
 export type AiReceptionistScheduleRow = {
