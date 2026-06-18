@@ -59,7 +59,7 @@ export default function IndustryPage({
       </section>
 
       {/* Pain Point Section */}
-      <section className="py-12 md:py-20 bg-secondary">
+      <section className="py-12 md:py-20 bg-muted">
         <div className="container max-w-3xl mx-auto">
           <div className="bg-white p-8 rounded-lg border border-border shadow-sm">
             <h2 className="text-2xl font-bold text-foreground mb-4">
@@ -72,7 +72,7 @@ export default function IndustryPage({
 
       {/* Stats Section */}
       {stats.length > 0 && (
-        <section className="py-12 md:py-20 bg-secondary">
+        <section className="py-12 md:py-20 bg-muted">
           <div className="container">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
               By The Numbers
@@ -117,7 +117,7 @@ export default function IndustryPage({
 
       {/* Testimonial Section */}
       {testimonial && (
-        <section className="py-12 md:py-20 bg-secondary">
+        <section className="py-12 md:py-20 bg-muted">
           <div className="container max-w-3xl mx-auto">
             <div className="text-center">
               <div className="mb-6 flex justify-center gap-1">
@@ -138,7 +138,7 @@ export default function IndustryPage({
       )}
 
       {/* Features Comparison */}
-      <section className="py-12 md:py-20 bg-secondary">
+      <section className="py-12 md:py-20 bg-muted">
         <div className="container max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
             What You Get
@@ -165,7 +165,7 @@ export default function IndustryPage({
       </section>
 
       {/* Pricing Preview */}
-      <section className="py-12 md:py-20 bg-secondary">
+      <section className="py-12 md:py-20 bg-muted">
         <div className="container max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
             Affordable Plans for Every Business
