@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, PhoneOff, Calendar, CreditCard, TrendingUp, ArrowUpRight, Building2, BookOpenText, BadgeDollarSign } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import { dashboardApi, summaryApi, type DashboardOverviewData, type DailySummaryData, type DailySummaryHistoryItem } from "@/lib/api";
+import { dashboardApi, numbersApi, summaryApi, type DashboardOverviewData, type DailySummaryData, type DailySummaryHistoryItem } from "@/lib/api";
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -65,6 +65,9 @@ export default function DashboardOverview() {
   const [performanceRange, setPerformanceRange] = useState<PerformanceRange>("weekly");
   const [customStartDate, setCustomStartDate] = useState(weeklyStartDate);
   const [customEndDate, setCustomEndDate] = useState(todayDate);
+  const [numberProvisioning, setNumberProvisioning] = useState(false);
+  const [numberProvisionAttempted, setNumberProvisionAttempted] = useState(false);
+  const [numberProvisioningError, setNumberProvisioningError] = useState("");
 
   useEffect(() => {
     const run = async () => {
@@ -79,7 +82,29 @@ export default function DashboardOverview() {
           return;
         }
 
-        const data = await dashboardApi.getOverview(query);
+        let data = await dashboardApi.getOverview(query);
+
+        if (!data.businessNumber && !numberProvisionAttempted) {
+          setNumberProvisionAttempted(true);
+          setNumberProvisioning(true);
+          setNumberProvisioningError("");
+          try {
+            const country = localStorage.getItem("qc_onboarding_country") || undefined;
+            const assignment = await numbersApi.assignDemoNumber({ region: country });
+            if (assignment?.phoneNumber) {
+              localStorage.setItem("qc_inbound_number", assignment.phoneNumber);
+            }
+            data = await dashboardApi.getOverview(query);
+          } catch (assignError: any) {
+            setNumberProvisioningError(assignError?.message || "Demo number setup is pending.");
+          } finally {
+            setNumberProvisioning(false);
+          }
+        }
+
+        if (data.businessNumber) {
+          localStorage.setItem("qc_inbound_number", data.businessNumber);
+        }
         setOverview(data);
         localStorage.setItem("qc_calls_used", String(data.callsUsed || 0));
         localStorage.setItem("qc_calls_limit", String((data.callsUsed || 0) + (data.callsRemaining || 0)));
@@ -91,7 +116,7 @@ export default function DashboardOverview() {
     };
 
     run();
-  }, [customEndDate, customStartDate, performanceRange]);
+  }, [customEndDate, customStartDate, numberProvisionAttempted, performanceRange]);
 
   useEffect(() => {
     const run = async () => {
@@ -369,7 +394,7 @@ export default function DashboardOverview() {
               </div>
               <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm font-semibold text-foreground">
-                  {businessNumber || "Not set"}
+                  {businessNumber || (numberProvisioning ? "Setting up..." : "Not set")}
                 </p>
                 {businessNumber && (
                   <Button asChild size="sm" variant="outline" className="h-8 text-xs">
@@ -380,6 +405,9 @@ export default function DashboardOverview() {
                   </Button>
                 )}
               </div>
+              {numberProvisioningError && !businessNumber && (
+                <p className="mt-2 text-xs text-destructive">{numberProvisioningError}</p>
+              )}
             </div>
           </div>
 
