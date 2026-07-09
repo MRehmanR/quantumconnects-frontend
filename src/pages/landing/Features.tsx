@@ -269,7 +269,7 @@ export default function Features() {
             Experience All Features Risk-Free
           </h2>
           <p className="text-lg mb-8 text-blue-100 max-w-2xl mx-auto">
-            Try Quantum Connects for 7 days with full access to all features.
+            Book a live demo and see the workflows tailored to your business.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button asChild size="lg" className="bg-white text-primary hover:bg-blue-50">
@@ -279,7 +279,7 @@ export default function Features() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/signup">Start Free Trial</Link>
+              <Link to="/signup">Book a Demo</Link>
             </Button>
           </div>
         </div>

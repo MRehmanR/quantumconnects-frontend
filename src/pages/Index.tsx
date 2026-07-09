@@ -109,7 +109,7 @@ export default function Index() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Link to="/signup">
                 <Button size="lg" className="bg-primary hover:bg-primary/90">
-                  Start Free Trial
+                  Book a Demo
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
@@ -117,7 +117,7 @@ export default function Index() {
                 <Button size="lg" variant="outline">Schedule a Demo</Button>
               </Link>
             </div>
-            <p className="text-sm text-muted-foreground">✓ 7 days free • No credit card required • Cancel anytime</p>
+            <p className="text-sm text-muted-foreground">✓ Book a demo • No credit card required for demo booking • Cancel anytime</p>
           </div>
         </div>
       </section>
@@ -280,12 +280,12 @@ export default function Index() {
                 size="lg"
                 className="bg-transparent text-white border-2 border-white hover:bg-white/10"
               >
-                Start Your Free Trial
+                Book a Demo
               </Button>
             </Link>
           </div>
 
-          <p className="text-sm text-blue-100 mt-4">7 days free • No credit card required • Cancel anytime</p>
+          <p className="text-sm text-blue-100 mt-4">Book a demo • No credit card required for demo booking • Cancel anytime</p>
         </div>
       </section>
 

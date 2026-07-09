@@ -123,13 +123,52 @@ export type ProvisionNumberData = {
   };
 };
 
-export type DemoNumberAssignment = {
-  demoId: number;
-  phoneNumber: string;
-  expiresAt: string | null;
-  status: "assigned" | "promoted" | "available" | "expired";
-  provider: string;
-  providerNumberId: string;
+export type DemoBookingData = {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  businessName: string;
+  businessDetails: string;
+  purchasePurpose: string;
+  industry: string;
+  callVolume: string;
+  challenge: string;
+  jobValue: string;
+  currentSystem: string;
+  timeline: string;
+  date: string;
+  time: string;
+  timezone: string;
+  status: string;
+  type: string;
+  emailDelivery?: {
+    from: string;
+    customerTo: string;
+    notificationTo: string;
+    confirmationSent: boolean;
+    notificationSent: boolean;
+    skipped: boolean;
+    error: string;
+  };
+};
+
+export type DemoBookingPayload = {
+  customerName: string;
+  customerPhone?: string;
+  customerEmail: string;
+  businessName: string;
+  businessDetails?: string;
+  purchasePurpose?: string;
+  industry?: string;
+  callVolume?: string;
+  challenge?: string;
+  jobValue?: string;
+  currentSystem?: string;
+  timeline?: string;
+  timezone?: string;
+  geoLocation?: Record<string, any>;
+  time: string;
 };
 
 export type AvailableBusinessNumberItem = {
@@ -262,32 +301,64 @@ export type AdminAnalyticsData = {
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const authToken = localStorage.getItem("qc_auth_token");
-  const response = await fetch(BASE_URL + url, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-      ...options?.headers,
-    },
-    ...options,
-  });
-
-  let payload: ApiEnvelope<T> | T;
   try {
-    payload = await response.json();
-  } catch {
-    payload = {} as T;
-  }
+    const response = await fetch(BASE_URL + url, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        ...options?.headers,
+      },
+      ...options,
+    });
 
-  if (!response.ok) {
-    const message = (payload as ApiEnvelope<T>).message || `${response.status} ${response.statusText}`;
-    throw new Error(`API Error: ${message}`);
-  }
+    let payload: ApiEnvelope<T> | T;
+    try {
+      payload = await response.json();
+    } catch {
+      payload = {} as T;
+    }
 
-  if (payload && typeof payload === "object" && "data" in (payload as ApiEnvelope<T>)) {
-    return (payload as ApiEnvelope<T>).data;
-  }
+    if (!response.ok) {
+      const status = response.status;
+      const friendlyMessage =
+        status === 400
+          ? "Please check your details and try again."
+          : status === 401
+            ? "Your session has expired. Please sign in again."
+            : status === 403
+              ? "You do not have access to this action."
+              : status === 404
+                ? "This feature is not available right now."
+                : status === 409
+                  ? "This item already exists."
+                  : status === 429
+                    ? "Too many requests. Please wait a moment and try again."
+                    : status >= 500
+                      ? "Something went wrong on our side. Please try again."
+                      : "Request failed. Please try again.";
 
-  return payload as T;
+      const error = new Error(friendlyMessage);
+      (error as Error & { status?: number; details?: string }).status = status;
+      (error as Error & { status?: number; details?: string }).details =
+        (payload as ApiEnvelope<T>)?.message || response.statusText || "";
+      throw error;
+    }
+
+    if (payload && typeof payload === "object" && "data" in (payload as ApiEnvelope<T>)) {
+      return (payload as ApiEnvelope<T>).data;
+    }
+
+    return payload as T;
+  } catch (error: any) {
+    if (error instanceof Error && error.message) {
+      const networkMessage =
+        error.message.includes("Failed to fetch") || error.message.includes("NetworkError")
+          ? "We could not reach the server. Please check your connection and try again."
+          : error.message;
+      throw new Error(networkMessage);
+    }
+    throw new Error("We could not reach the server. Please check your connection and try again.");
+  }
 }
 
 const getOwnerContext = () => ({
@@ -323,6 +394,16 @@ export const authApi = {
         referralMethod: data.referralMethod,
       }),
     }),
+  forgotPassword: (data: { email: string }) =>
+    request<{ sent: boolean; delivery: string }>("/api/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  resetPassword: (data: { email: string; token: string; password: string }) =>
+    request<{ reset: boolean }>("/api/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   getAvailableBusinessNumbers: (params?: { country?: string; areaCode?: string; contains?: string; limit?: number }) => {
     const safeParams: Record<string, string> = {};
     if (params?.country) safeParams.country = params.country;
@@ -345,12 +426,12 @@ export const authApi = {
     ),
 };
 
-export const numbersApi = {
-  assignDemoNumber: (data?: { region?: string; voicePreferences?: Record<string, any>; ttlHours?: number }) =>
-    request<DemoNumberAssignment>("/api/auth/assign-demo", { method: "POST", body: JSON.stringify(data || {}) }),
-  promoteDemoNumber: (data: { demoId: number; paymentId?: string }) =>
-    request<DemoNumberAssignment>("/api/numbers/promote", { method: "POST", body: JSON.stringify(data) }),
-  getActiveDemoNumber: () => request<DemoNumberAssignment | null>("/api/auth/active-demo"),
+export const demoApi = {
+  bookDemo: (data: DemoBookingPayload) =>
+    request<DemoBookingData>("/api/book-demo", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 };
 
 export type AiReceptionistScheduleRow = {

@@ -139,21 +139,6 @@ export default function Signup() {
         localStorage.setItem("qc_onboarding_error", payloadData.provisioningError);
       }
 
-      if (!payloadData?.retellAgentId && localStorage.getItem("qc_inbound_number")) {
-        setLoadingStep("Setting up voice agent...");
-        try {
-          const retell = await authApi.provisionRetellVoiceAgent();
-          if (retell?.retellAgentId) {
-            localStorage.setItem("qc_retell_agent_id", retell.retellAgentId);
-          }
-          if (retell?.provisioningStatus) {
-            localStorage.setItem("qc_provisioning_status", retell.provisioningStatus);
-          }
-        } catch (retellError: any) {
-          localStorage.setItem("qc_onboarding_error", retellError?.message || "Voice agent setup needs attention.");
-        }
-      }
-
       setLoadingStep("Finalizing dashboard...");
       navigate("/dashboard");
     } catch (err: any) {
@@ -165,9 +150,9 @@ export default function Signup() {
   };
 
   const benefits = [
-    "50 calls free, no credit card required",
-    "Live in under 10 minutes",
-    "Cancel any time",
+    "Dashboard access after signup",
+    "Book a live demo any time",
+    "Activate calls after choosing a plan",
   ];
 
   return (
@@ -230,7 +215,7 @@ export default function Signup() {
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-foreground tracking-tight">Create your account</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Free trial — 50 calls included, no credit card needed.
+              Create your account and go straight to the dashboard. Book a demo when you want a live walkthrough.
             </p>
           </div>
 

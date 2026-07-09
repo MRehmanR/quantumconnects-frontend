@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 
 const plans = [
   {
-    name: "Trial",
+    name: "Demo",
     price: 0,
-    calls: 50,
-    concurrent: 1,
-    period: "free forever",
-    features: ["50 calls/month", "1 concurrent call", "Basic AI responses", "Email support"],
-    cta: "Start Free",
+    calls: 0,
+    concurrent: 0,
+    period: "live walkthrough",
+    features: ["Personalized walkthrough", "Business fit review", "Call flow planning", "No phone number assigned"],
+    cta: "Book Demo",
     popular: false,
   },
   {
@@ -148,7 +148,7 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              <Link to="/signup">
+              <Link to={plan.price === 0 ? "/book-demo" : "/signup"}>
                 <Button
                   className={`w-full text-sm h-9 ${
                     plan.popular

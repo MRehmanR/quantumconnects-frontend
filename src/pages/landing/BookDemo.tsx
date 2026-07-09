@@ -24,32 +24,56 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { ArrowRight, Calendar, CheckCircle } from "lucide-react";
+import { ArrowRight, Calendar, CheckCircle, Clock, Loader2, Mail, Phone } from "lucide-react";
+import { demoApi, type DemoBookingData } from "@/lib/api";
 
 const formSchema = z.object({
+  customerName: z.string().min(2, "Please enter your name"),
+  customerEmail: z.string().email("Please enter a valid email address"),
+  customerPhone: z.string().min(7, "Please enter your phone number"),
+  businessName: z.string().min(2, "Please enter your business name"),
   industry: z.string().min(1, "Please select your industry"),
   callVolume: z.string().min(1, "Please enter your monthly call volume"),
   challenge: z.string().min(1, "Please select your biggest challenge"),
   jobValue: z.string().min(1, "Please enter your average job/service value"),
   currentSystem: z.string().min(1, "Please select if you use a booking system"),
   timeline: z.string().min(1, "Please select your preferred timeline"),
+  purchasePurpose: z.string().min(1, "Please tell us what you want to achieve"),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
+const demoTimeSlots = ["09:00", "10:00", "11:30", "13:00", "14:30", "16:00"];
+
+const getClientTimezone = () => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  } catch {
+    return "UTC";
+  }
+};
+
 export default function BookDemo() {
   const [step, setStep] = useState<"form" | "calendar" | "success">("form");
   const [formData, setFormData] = useState<FormData | null>(null);
+  const [selectedTime, setSelectedTime] = useState("10:00");
+  const [isBooking, setIsBooking] = useState(false);
+  const [booking, setBooking] = useState<DemoBookingData | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      customerName: "",
+      customerEmail: "",
+      customerPhone: "",
+      businessName: "",
       industry: "",
       callVolume: "",
       challenge: "",
       jobValue: "",
       currentSystem: "",
       timeline: "",
+      purchasePurpose: "",
     },
   });
 
@@ -59,9 +83,48 @@ export default function BookDemo() {
     toast.success("Great! Now let's book your demo.");
   };
 
-  const handleCalendarConfirm = () => {
-    setStep("success");
-    toast.success("Demo scheduled! Check your email for confirmation.");
+  const handleCalendarConfirm = async () => {
+    if (!formData) return;
+
+    setIsBooking(true);
+    try {
+      const timezone = getClientTimezone();
+      const result = await demoApi.bookDemo({
+        customerName: formData.customerName,
+        customerEmail: formData.customerEmail,
+        customerPhone: formData.customerPhone,
+        businessName: formData.businessName,
+        businessDetails: [
+          `Industry: ${formData.industry}`,
+          `Monthly calls: ${formData.callVolume}`,
+          `Average job value: ${formData.jobValue}`,
+          `Current booking/CRM system: ${formData.currentSystem}`,
+        ].join("\n"),
+        purchasePurpose: formData.purchasePurpose,
+        industry: formData.industry,
+        callVolume: formData.callVolume,
+        challenge: formData.challenge,
+        jobValue: formData.jobValue,
+        currentSystem: formData.currentSystem,
+        timeline: formData.timeline,
+        timezone,
+        geoLocation: { timezone },
+        time: selectedTime,
+      });
+
+      setBooking(result);
+      setStep("success");
+      if (result.emailDelivery?.confirmationSent) {
+        toast.success(`Demo scheduled. Confirmation sent to ${result.customerEmail}.`);
+      } else {
+        toast.success("Demo scheduled. Email confirmation is pending server email setup.");
+      }
+    } catch (error: any) {
+      const details = error?.details ? ` ${error.details}` : "";
+      toast.error(`${error?.message || "Could not book demo."}${details}`);
+    } finally {
+      setIsBooking(false);
+    }
   };
 
   return (
@@ -103,6 +166,66 @@ export default function BookDemo() {
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-6"
                   >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="customerName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Your name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., Sarah Ahmed" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="businessName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Business name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., Bright Dental Studio" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="customerEmail"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email for confirmation</FormLabel>
+                            <FormControl>
+                              <Input type="email" placeholder="you@business.com" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="customerPhone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone number</FormLabel>
+                            <FormControl>
+                              <Input type="tel" placeholder="+44 7000 000000" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
                     {/* Question 1: Industry */}
                     <FormField
                       control={form.control}
@@ -279,6 +402,24 @@ export default function BookDemo() {
                       )}
                     />
 
+                    <FormField
+                      control={form.control}
+                      name="purchasePurpose"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>What should this service help you improve?</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              rows={4}
+                              placeholder="e.g., Reduce missed calls, book more appointments, qualify leads after hours"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <Button
                       type="submit"
                       size="lg"
@@ -307,6 +448,12 @@ export default function BookDemo() {
                   </p>
                   <ul className="space-y-2 text-sm">
                     <li>
+                      <strong>Contact:</strong> {formData.customerName} ({formData.customerEmail})
+                    </li>
+                    <li>
+                      <strong>Business:</strong> {formData.businessName}
+                    </li>
+                    <li>
                       <strong>Industry:</strong> {formData.industry}
                     </li>
                     <li>
@@ -321,17 +468,45 @@ export default function BookDemo() {
                   </ul>
                 </div>
 
-                {/* Calendar Placeholder */}
-                <div className="mb-8 p-12 bg-secondary rounded-lg border border-border flex items-center justify-center min-h-[400px]">
-                  <div className="text-center">
-                    <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                    <p className="text-lg font-semibold text-foreground mb-2">
-                      Calendar Integration
-                    </p>
-                    <p className="text-muted-foreground max-w-xs">
-                      Your developer will integrate Google Calendar here. Users
-                      can select their preferred demo time.
-                    </p>
+                <div className="mb-8 p-6 bg-white rounded-lg border border-border shadow-sm">
+                  <div className="flex items-start gap-3 mb-5">
+                    <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">Choose a time for tomorrow</p>
+                      <p className="text-sm text-muted-foreground">
+                        Times are shown in your local timezone: {getClientTimezone()}.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {demoTimeSlots.map((slot) => (
+                      <button
+                        type="button"
+                        key={slot}
+                        onClick={() => setSelectedTime(slot)}
+                        className={`h-12 rounded-md border text-sm font-semibold transition-colors ${
+                          selectedTime === slot
+                            ? "border-primary bg-primary text-white"
+                            : "border-border bg-muted text-foreground hover:border-primary/60 hover:bg-primary/5"
+                        }`}
+                      >
+                        {slot}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-foreground">
+                      <Mail className="w-4 h-4 text-primary" />
+                      <span className="truncate">{formData.customerEmail}</span>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-foreground">
+                      <Phone className="w-4 h-4 text-primary" />
+                      <span className="truncate">{formData.customerPhone}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -348,9 +523,19 @@ export default function BookDemo() {
                     size="lg"
                     className="flex-1 bg-primary text-white hover:bg-primary/90"
                     onClick={handleCalendarConfirm}
+                    disabled={isBooking}
                   >
-                    Confirm & Schedule
-                    <ArrowRight className="ml-2 w-4 h-4" />
+                    {isBooking ? (
+                      <>
+                        <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                        Scheduling
+                      </>
+                    ) : (
+                      <>
+                        Confirm & Schedule
+                        <ArrowRight className="ml-2 w-4 h-4" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </Card>
@@ -369,38 +554,45 @@ export default function BookDemo() {
                 </h2>
 
                 <p className="text-lg text-muted-foreground mb-8 max-w-lg mx-auto">
-                  Thank you for booking. We've sent a confirmation email with
-                  your demo details and a personalized solution overview based on
-                  your business profile.
+                  Thank you for booking. Your demo is scheduled for{" "}
+                  <strong className="text-foreground">
+                    {booking?.date} at {booking?.time} ({booking?.timezone})
+                  </strong>
+                  .
                 </p>
 
                 <div className="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-8 text-left">
                   <p className="text-sm font-semibold text-foreground mb-3">
-                    What happens next:
+                    Confirmation details:
                   </p>
                   <ul className="space-y-2 text-sm text-muted-foreground">
                     <li className="flex gap-2">
                       <span className="text-blue-600 font-bold">✓</span>
                       <span>
-                        Confirmation email with demo link and dial-in details
+                        Client confirmation {booking?.emailDelivery?.confirmationSent ? "sent" : "not sent yet"} to{" "}
+                        {booking?.emailDelivery?.customerTo || booking?.customerEmail}
                       </span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-blue-600 font-bold">✓</span>
                       <span>
-                        Personalized solution document prepared for your industry
+                        Internal notification {booking?.emailDelivery?.notificationSent ? "sent" : "not sent yet"} to{" "}
+                        {booking?.emailDelivery?.notificationTo || "the configured demo notification email"}
                       </span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-blue-600 font-bold">✓</span>
                       <span>
-                        Live walkthrough of how Quantum Connects solves your
-                        challenges
+                        Sent from {booking?.emailDelivery?.from || "SMTP_FROM in backend .env"}
                       </span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-blue-600 font-bold">✓</span>
-                      <span>ROI calculation specific to your business</span>
+                      <span>
+                        {booking?.emailDelivery?.error
+                          ? booking.emailDelivery.error
+                          : "Your business profile is saved for the demo."}
+                      </span>
                     </li>
                   </ul>
                 </div>

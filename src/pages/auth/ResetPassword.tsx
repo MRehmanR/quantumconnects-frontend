@@ -5,6 +5,7 @@ import { Zap, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { authApi } from "@/lib/api";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -36,16 +37,7 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, token, password }),
-      });
-
-      const payload = await res.json().catch(() => null);
-      if (!res.ok) {
-        throw new Error(payload?.message || "Failed to reset password");
-      }
+      await authApi.resetPassword({ email, token, password });
 
       setMessage("Password updated. You can now sign in.");
       setTimeout(() => navigate("/login"), 1200);

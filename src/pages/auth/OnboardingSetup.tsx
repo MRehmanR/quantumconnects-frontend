@@ -69,26 +69,6 @@ export default function OnboardingSetup() {
         await authApi.importWebsiteKnowledge({ websiteUrl: trimmedWebsite }).catch(() => null);
       }
 
-      if (!localStorage.getItem("qc_inbound_number")) {
-        localStorage.setItem("qc_onboarding_error", "Demo number is not assigned yet. Please choose a plan or contact support.");
-        setStep("done");
-        navigate("/dashboard");
-        return;
-      }
-
-      const retell = await authApi.provisionRetellVoiceAgent({
-        customPrompt: promptValue || undefined,
-      });
-
-      if (retell?.retellAgentId) {
-        localStorage.setItem("qc_retell_agent_id", retell.retellAgentId);
-      } else {
-        localStorage.removeItem("qc_retell_agent_id");
-      }
-      if (retell?.provisioningStatus) {
-        localStorage.setItem("qc_provisioning_status", retell.provisioningStatus);
-      }
-
       setStep("done");
       navigate("/dashboard");
     } catch (err: any) {

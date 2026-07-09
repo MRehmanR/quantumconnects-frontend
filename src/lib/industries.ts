@@ -70,7 +70,7 @@ export const industries: Industry[] = [
       author: "James Mitchell",
       business: "Mitchell Plumbing, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "plumber answering service",
       "emergency plumbing calls",
@@ -119,7 +119,7 @@ export const industries: Industry[] = [
       author: "David Thompson",
       business: "Thompson Electrical Services, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "electrician answering service",
       "electrical emergency calls",
@@ -168,7 +168,7 @@ export const industries: Industry[] = [
       author: "Sophie Williams",
       business: "Williams Hair Studio, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "hair salon appointment booking",
       "salon call answering",
@@ -217,7 +217,7 @@ export const industries: Industry[] = [
       author: "Dr. Patel",
       business: "Patel Dental Practice, Leeds",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "dental practice answering service",
       "dental appointment booking",
@@ -266,7 +266,7 @@ export const industries: Industry[] = [
       author: "Marco Rossi",
       business: "Rossi's Italian Restaurant, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "restaurant reservation system",
       "restaurant answering service",
@@ -315,7 +315,7 @@ export const industries: Industry[] = [
       author: "Sarah Johnson",
       business: "Johnson Physiotherapy Clinic, Birmingham",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "physiotherapy booking system",
       "physio appointment scheduling",
@@ -364,7 +364,7 @@ export const industries: Industry[] = [
       author: "Emma Davies",
       business: "Davies Beauty & Spa, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "beauty salon booking system",
       "spa appointment scheduling",
@@ -413,7 +413,7 @@ export const industries: Industry[] = [
       author: "Richard Clarke",
       business: "Clarke & Associates Solicitors, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "law firm answering service",
       "legal practice call handling",
@@ -462,7 +462,7 @@ export const industries: Industry[] = [
       author: "Jennifer Lee",
       business: "Lee Accounting Services, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "accountant answering service",
       "bookkeeper call handling",
@@ -511,7 +511,7 @@ export const industries: Industry[] = [
       author: "Dr. Amelia Foster",
       business: "Foster Aesthetic Clinic, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "aesthetic clinic booking",
       "cosmetic practice answering",
@@ -558,7 +558,7 @@ export const industries: Industry[] = [
       author: "Tom Harris",
       business: "Harris Emergency Plumbing, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "emergency plumber answering",
       "24/7 plumbing service",
@@ -604,7 +604,7 @@ export const industries: Industry[] = [
       author: "Peter Collins",
       business: "Collins Drainage Services, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "drain unblocking service",
       "drainage specialist answering",
@@ -650,7 +650,7 @@ export const industries: Industry[] = [
       author: "Alex Turner",
       business: "Turner Emergency Electrical, Leeds",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "emergency electrician service",
       "electrical emergency calls",
@@ -696,7 +696,7 @@ export const industries: Industry[] = [
       author: "Michael Brown",
       business: "Brown's 24/7 Locksmith, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "24/7 locksmith service",
       "emergency locksmith answering",
@@ -742,7 +742,7 @@ export const industries: Industry[] = [
       author: "Robert Green",
       business: "Green Heating Services, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "boiler breakdown service",
       "heating engineer answering",
@@ -788,7 +788,7 @@ export const industries: Industry[] = [
       author: "Lisa White",
       business: "White Appliance Repair, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "appliance repair service",
       "same-day repair booking",
@@ -834,7 +834,7 @@ export const industries: Industry[] = [
       author: "James Wilson",
       business: "Wilson Roofing Services, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "roof leak repair service",
       "emergency roofing calls",
@@ -882,7 +882,7 @@ export const industries: Industry[] = [
       author: "David Brown",
       business: "Brown Heating Solutions, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "boiler installation service",
       "heating installation answering",
@@ -928,7 +928,7 @@ export const industries: Industry[] = [
       author: "Mark Taylor",
       business: "Taylor HVAC Solutions, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "HVAC installation service",
       "air conditioning installer",
@@ -974,7 +974,7 @@ export const industries: Industry[] = [
       author: "Emma Green",
       business: "Green Energy Solutions, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "heat pump installation",
       "heat pump installer answering",
@@ -1020,7 +1020,7 @@ export const industries: Industry[] = [
       author: "Tom Harris",
       business: "Harris EV Solutions, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "EV charger installation",
       "electric vehicle charger installer",
@@ -1066,7 +1066,7 @@ export const industries: Industry[] = [
       author: "Sarah Green",
       business: "Green Solar Solutions, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "solar panel installation",
       "solar installer answering service",
@@ -1112,7 +1112,7 @@ export const industries: Industry[] = [
       author: "Paul Brown",
       business: "Brown Kitchen Installations, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "kitchen installation service",
       "kitchen installer answering",
@@ -1158,7 +1158,7 @@ export const industries: Industry[] = [
       author: "Lisa White",
       business: "White Bathroom Solutions, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "bathroom fitter service",
       "bathroom installation answering",
@@ -1204,7 +1204,7 @@ export const industries: Industry[] = [
       author: "Mark Taylor",
       business: "Taylor Windows & Doors, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "window installation service",
       "door installation answering",
@@ -1250,7 +1250,7 @@ export const industries: Industry[] = [
       author: "John Smith",
       business: "Smith Flooring Solutions, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "flooring company answering service",
       "flooring installation service",
@@ -1298,7 +1298,7 @@ export const industries: Industry[] = [
       author: "Chris Martin",
       business: "Martin Window Cleaning, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "window cleaning service",
       "commercial window cleaning",
@@ -1344,7 +1344,7 @@ export const industries: Industry[] = [
       author: "Robert Green",
       business: "Green Gutter Cleaning, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "gutter cleaning service",
       "gutter cleaner answering service",
@@ -1390,7 +1390,7 @@ export const industries: Industry[] = [
       author: "Tom Wilson",
       business: "Wilson Pressure Washing, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "pressure washing service",
       "pressure washer answering service",
@@ -1436,7 +1436,7 @@ export const industries: Industry[] = [
       author: "Emma Brown",
       business: "Brown Carpet Cleaning, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "carpet cleaning service",
       "carpet cleaner answering service",
@@ -1482,7 +1482,7 @@ export const industries: Industry[] = [
       author: "Lisa Taylor",
       business: "Taylor End-of-Tenancy Cleaning, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "end of tenancy cleaning",
       "tenancy cleaning service",
@@ -1528,7 +1528,7 @@ export const industries: Industry[] = [
       author: "Paul Harris",
       business: "Harris Commercial Cleaning, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "commercial cleaning service",
       "office cleaning answering service",
@@ -1576,7 +1576,7 @@ export const industries: Industry[] = [
       author: "Michael Johnson",
       business: "Johnson Plumbing, Leeds",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "plumber answering service",
       "plumbing call capture",
@@ -1622,7 +1622,7 @@ export const industries: Industry[] = [
       author: "David Lee",
       business: "Lee Electrical Services, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "electrician answering service",
       "electrical call capture",
@@ -1668,7 +1668,7 @@ export const industries: Industry[] = [
       author: "John Smith",
       business: "Smith Handyman Services, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "handyman service answering",
       "handyman call capture",
@@ -1714,7 +1714,7 @@ export const industries: Industry[] = [
       author: "Mark Wilson",
       business: "Wilson Property Maintenance, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "property maintenance service",
       "maintenance company answering",
@@ -1760,7 +1760,7 @@ export const industries: Industry[] = [
       author: "Tom Brown",
       business: "Brown Construction, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "builder answering service",
       "construction company phone system",
@@ -1806,7 +1806,7 @@ export const industries: Industry[] = [
       author: "Robert Green",
       business: "Green Carpentry & Joinery, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "carpentry service answering",
       "joinery company phone system",
@@ -1854,7 +1854,7 @@ export const industries: Industry[] = [
       author: "Emma Green",
       business: "Green Landscaping Solutions, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "landscaping company answering service",
       "landscape design phone system",
@@ -1900,7 +1900,7 @@ export const industries: Industry[] = [
       author: "Sarah Brown",
       business: "Brown Garden Maintenance, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "garden maintenance service",
       "garden care answering service",
@@ -1946,7 +1946,7 @@ export const industries: Industry[] = [
       author: "James Wilson",
       business: "Wilson Tree Surgery, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "tree surgeon answering service",
       "tree surgery call capture",
@@ -1992,7 +1992,7 @@ export const industries: Industry[] = [
       author: "Tom Harris",
       business: "Harris Fencing Contractors, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "fencing contractor answering service",
       "fence installation phone system",
@@ -2038,7 +2038,7 @@ export const industries: Industry[] = [
       author: "Mark Taylor",
       business: "Taylor Paving Solutions, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "paving contractor answering service",
       "driveway installer phone system",
@@ -2084,7 +2084,7 @@ export const industries: Industry[] = [
       author: "Emma Green",
       business: "Green Decking Specialists, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "decking specialist answering service",
       "deck builder phone system",
@@ -2132,7 +2132,7 @@ export const industries: Industry[] = [
       author: "Chris Martin",
       business: "Martin Pest Control, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "pest control service answering",
       "pest control company phone system",
@@ -2178,7 +2178,7 @@ export const industries: Industry[] = [
       author: "Robert Green",
       business: "Green Fire Safety Solutions, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "fire safety installer answering service",
       "fire alarm system phone system",
@@ -2224,7 +2224,7 @@ export const industries: Industry[] = [
       author: "Mark Wilson",
       business: "Wilson Security Solutions, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "CCTV installer answering service",
       "security system phone system",
@@ -2270,7 +2270,7 @@ export const industries: Industry[] = [
       author: "Lisa Taylor",
       business: "Taylor Alarm Systems, Bristol",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "alarm system installer answering service",
       "security alarm phone system",
@@ -2318,7 +2318,7 @@ export const industries: Industry[] = [
       author: "Tom Brown",
       business: "Brown Mobile Mechanics, Manchester",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "mobile mechanic answering service",
       "mobile repair phone system",
@@ -2364,7 +2364,7 @@ export const industries: Industry[] = [
       author: "John Smith",
       business: "Smith Mobile Tyres, London",
     },
-    cta: "Start Your Free Trial",
+    cta: "Book a Demo",
     seoKeywords: [
       "mobile tyre fitting answering service",
       "tyre fitter phone system",

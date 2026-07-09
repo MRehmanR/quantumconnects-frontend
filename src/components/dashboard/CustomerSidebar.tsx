@@ -41,13 +41,6 @@ export default function CustomerSidebar({ collapsed, onToggle, className, hideCo
     navigate("/login");
   };
 
-  const callsLimit = Number(localStorage.getItem("qc_calls_limit") || "150");
-  const callsUsed = Number(localStorage.getItem("qc_calls_used") || "0");
-  const trialTotalDays = 7;
-  const trialUsedDays = Math.min(Math.floor(callsUsed / Math.max(callsLimit / trialTotalDays, 1)), trialTotalDays);
-  const trialDaysLeft = Math.max(trialTotalDays - trialUsedDays, 0);
-  const trialProgress = Math.min(Math.round((trialUsedDays / trialTotalDays) * 100), 100);
-
   return (
     <aside
       className={cn(
@@ -105,18 +98,13 @@ export default function CustomerSidebar({ collapsed, onToggle, className, hideCo
       {!collapsed && (
         <div className="px-3 pb-3">
           <div className="rounded-xl border border-border bg-muted/30 p-3 space-y-2">
-            <div className="flex items-center justify-between text-sm font-semibold text-amber-500">
-              <span>7-day free trial</span>
-              <span>{trialDaysLeft} days left</span>
-            </div>
-            <div className="h-2 rounded-full bg-muted overflow-hidden">
-              <div className="h-full rounded-full bg-amber-400" style={{ width: `${trialProgress}%` }} />
-            </div>
+            <p className="text-sm font-semibold text-foreground">Ready for a live walkthrough?</p>
+            <p className="text-xs text-muted-foreground">Book a demo or choose a paid plan when you are ready to activate calls.</p>
             <Link
-              to="/dashboard/billing"
+              to="/book-demo"
               className="flex w-full items-center justify-center rounded-lg bg-primary py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Choose a Plan
+              Book Demo
             </Link>
           </div>
         </div>

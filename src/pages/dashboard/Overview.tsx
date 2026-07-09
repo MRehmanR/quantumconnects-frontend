@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, PhoneOff, Calendar, CreditCard, TrendingUp, ArrowUpRight, Building2, BookOpenText, BadgeDollarSign } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import { dashboardApi, numbersApi, summaryApi, type DashboardOverviewData, type DailySummaryData, type DailySummaryHistoryItem } from "@/lib/api";
+import { dashboardApi, summaryApi, type DashboardOverviewData, type DailySummaryData, type DailySummaryHistoryItem } from "@/lib/api";
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -65,9 +65,6 @@ export default function DashboardOverview() {
   const [performanceRange, setPerformanceRange] = useState<PerformanceRange>("weekly");
   const [customStartDate, setCustomStartDate] = useState(weeklyStartDate);
   const [customEndDate, setCustomEndDate] = useState(todayDate);
-  const [numberProvisioning, setNumberProvisioning] = useState(false);
-  const [numberProvisionAttempted, setNumberProvisionAttempted] = useState(false);
-  const [numberProvisioningError, setNumberProvisioningError] = useState("");
 
   useEffect(() => {
     const run = async () => {
@@ -82,25 +79,7 @@ export default function DashboardOverview() {
           return;
         }
 
-        let data = await dashboardApi.getOverview(query);
-
-        if (!data.businessNumber && !numberProvisionAttempted) {
-          setNumberProvisionAttempted(true);
-          setNumberProvisioning(true);
-          setNumberProvisioningError("");
-          try {
-            const country = localStorage.getItem("qc_onboarding_country") || undefined;
-            const assignment = await numbersApi.assignDemoNumber({ region: country });
-            if (assignment?.phoneNumber) {
-              localStorage.setItem("qc_inbound_number", assignment.phoneNumber);
-            }
-            data = await dashboardApi.getOverview(query);
-          } catch (assignError: any) {
-            setNumberProvisioningError(assignError?.message || "Demo number setup is pending.");
-          } finally {
-            setNumberProvisioning(false);
-          }
-        }
+        const data = await dashboardApi.getOverview(query);
 
         if (data.businessNumber) {
           localStorage.setItem("qc_inbound_number", data.businessNumber);
@@ -116,7 +95,7 @@ export default function DashboardOverview() {
     };
 
     run();
-  }, [customEndDate, customStartDate, numberProvisionAttempted, performanceRange]);
+  }, [customEndDate, customStartDate, performanceRange]);
 
   useEffect(() => {
     const run = async () => {
@@ -157,6 +136,7 @@ export default function DashboardOverview() {
     ? overview?.dailyPerformance || []
     : mockDailyPerformance;
   const businessNumber = overview?.businessNumber || localStorage.getItem("qc_inbound_number") || "";
+  const isFreePlan = (overview?.currentPlan || "").toLowerCase() === "free";
 
   const stats = useMemo(
     () => [
@@ -193,11 +173,11 @@ export default function DashboardOverview() {
         icon: CreditCard,
         iconBg: "bg-muted",
         iconColor: "text-muted-foreground",
-        delta: `Next billing ${overview?.nextBillingDate || "-"}`,
+        delta: isFreePlan ? "Book demo or choose a plan" : `Next billing ${overview?.nextBillingDate || "-"}`,
         trend: "neutral",
       },
     ],
-    [overview, callsLimit]
+    [overview, callsLimit, isFreePlan]
   );
 
   return (
@@ -333,16 +313,18 @@ export default function DashboardOverview() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-semibold text-foreground">Plan Usage</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">{overview?.currentPlan || "Core"} plan usage</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {isFreePlan ? "Activate calls by choosing a paid plan." : `${overview?.currentPlan || "Core"} plan usage`}
+              </p>
             </div>
             <Link to="/dashboard/billing" className="text-xs text-primary hover:underline font-medium">
-              Upgrade plan
+              Choose plan
             </Link>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex-1">
               <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="text-muted-foreground">Calls used</span>
+                <span className="text-muted-foreground">{isFreePlan ? "Calls active after paid plan" : "Calls used"}</span>
                 <span className="font-semibold text-foreground">
                   {overview?.callsUsed || 0} / {callsLimit}
                 </span>
@@ -394,7 +376,7 @@ export default function DashboardOverview() {
               </div>
               <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm font-semibold text-foreground">
-                  {businessNumber || (numberProvisioning ? "Setting up..." : "Not set")}
+                  {businessNumber || "Not active yet"}
                 </p>
                 {businessNumber && (
                   <Button asChild size="sm" variant="outline" className="h-8 text-xs">
@@ -405,8 +387,8 @@ export default function DashboardOverview() {
                   </Button>
                 )}
               </div>
-              {numberProvisioningError && !businessNumber && (
-                <p className="mt-2 text-xs text-destructive">{numberProvisioningError}</p>
+              {!businessNumber && (
+                <p className="mt-2 text-xs text-muted-foreground">Choose a paid plan to activate your phone number and AI agent.</p>
               )}
             </div>
           </div>

@@ -28,10 +28,10 @@ export default function FAQ() {
         "We offer three main plans: Rise (£99/month for 150 minutes), Elevate (£249/month for 500 minutes), and Apex (£499/month for 1,100 minutes). CRM integration is included free in Apex, or available as a one-time £297 add-on for Rise and Elevate. There's also a custom Bespoke plan for enterprise needs.",
     },
     {
-      id: "trial",
-      question: "Is there a free trial?",
+      id: "demo",
+      question: "Is there a demo?",
       answer:
-        "Yes! You get 7 days completely free with no credit card required. You can cancel anytime. During the trial, you get full access to all features in your chosen plan so you can experience the full value.",
+        "Yes. Book a live demo and share your business details, call volume, and goals. We use that information to prepare a walkthrough tailored to your needs.",
     },
     {
       id: "minutes",
@@ -160,7 +160,7 @@ export default function FAQ() {
                 <Link to="/contact">Contact Us</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                <Link to="/signup">Start Free Trial</Link>
+                <Link to="/signup">Book a Demo</Link>
               </Button>
             </div>
           </div>

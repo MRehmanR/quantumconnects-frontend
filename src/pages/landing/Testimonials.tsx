@@ -207,10 +207,10 @@ export default function Testimonials() {
               Ready to Join Them?
             </h2>
             <p className="text-lg text-blue-100 mb-8">
-              Start your free 7-day trial and see the difference Quantum Connects can make
+              Start your live demo and see the difference Quantum Connects can make
             </p>
             <Button asChild size="lg" className="bg-white text-primary hover:bg-slate-100">
-              <Link to="/signup">Start Free Trial</Link>
+              <Link to="/signup">Book a Demo</Link>
             </Button>
           </div>
         </div>

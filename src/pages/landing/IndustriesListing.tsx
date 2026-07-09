@@ -319,7 +319,7 @@ export default function IndustriesListing() {
               variant="outline"
               className="text-white border-white hover:bg-blue-600"
             >
-              <Link to="/signup">Start Your Free Trial</Link>
+              <Link to="/signup">Book a Demo</Link>
             </Button>
           </div>
         </div>

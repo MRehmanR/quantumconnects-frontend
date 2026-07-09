@@ -79,7 +79,7 @@ export default function SourceHeader() {
           </Link>
           <Link to="/signup">
             <Button size="sm" className="bg-primary hover:bg-primary/90">
-              Start Free Trial
+              Book a Demo
             </Button>
           </Link>
         </div>
@@ -131,7 +131,7 @@ export default function SourceHeader() {
                 </Button>
               </Link>
               <Link to="/signup" onClick={() => setIsOpen(false)}>
-                <Button className="w-full bg-primary hover:bg-primary/90">Start Free Trial</Button>
+                <Button className="w-full bg-primary hover:bg-primary/90">Book a Demo</Button>
               </Link>
             </div>
           </nav>

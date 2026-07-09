@@ -189,7 +189,7 @@ export default function IndustryPage({
             </Card>
           </div>
           <p className="text-muted-foreground mb-8">
-            Start with a free 7-day trial. No credit card required.
+            Start with a live demo. No credit card required for demo booking.
           </p>
           <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
             <Link to="/book-demo">
@@ -217,7 +217,7 @@ export default function IndustryPage({
               </Link>
             </Button>
             <Button asChild size="lg" className="bg-transparent text-white border-2 border-white hover:bg-white/10">
-              <Link to="/signup">Start Your Free Trial</Link>
+              <Link to="/signup">Book a Demo</Link>
             </Button>
           </div>
         </div>

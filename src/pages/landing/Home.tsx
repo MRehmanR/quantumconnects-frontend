@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import LiveCounterV2 from "@/components/LiveCounterV2";
 
 
@@ -112,24 +112,20 @@ export default function Home() {
               customers happy - all automatically.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Link href="/signup">
-                <a>
-                  <Button size="lg" className="bg-primary hover:bg-primary/90">
-                    Start Free Trial
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </a>
+              <Link to="/signup">
+                <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90">
+                  Book a Demo
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
               </Link>
-              <Link href="/book-demo">
-                <a>
-                  <Button size="lg" variant="outline">
-                    Schedule a Demo
-                  </Button>
-                </a>
+              <Link to="/book-demo">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                  Schedule a Demo
+                </Button>
               </Link>
             </div>
             <p className="text-sm text-muted-foreground">
-              7 days free | No credit card required | Cancel anytime
+              Book a demo | No credit card required for demo booking | Cancel anytime
             </p>
           </div>
         </div>
@@ -293,29 +289,25 @@ export default function Home() {
             Join hundreds of service businesses already using Quantum Connects
             to never miss a call again.
           </p>
-          <Link href="/book-demo">
-            <a>
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-blue-50 mr-4"
-              >
-                Schedule a Demo
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </a>
+          <Link to="/book-demo">
+            <Button
+              size="lg"
+              className="w-full sm:w-auto bg-white text-primary hover:bg-blue-50 mr-0 sm:mr-4 mb-3 sm:mb-0"
+            >
+              Schedule a Demo
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
           </Link>
-          <Link href="/">
-            <a>
-              <Button
-                size="lg"
-                className="bg-transparent text-white border-2 border-white hover:bg-white/10"
-              >
-                Start Your Free Trial
-              </Button>
-            </a>
+          <Link to="/signup">
+            <Button
+              size="lg"
+              className="w-full sm:w-auto bg-transparent text-white border-2 border-white hover:bg-white/10"
+            >
+              Book a Demo
+            </Button>
           </Link>
           <p className="text-sm text-blue-100 mt-4">
-            7 days free • No credit card required • Cancel anytime
+            Book a demo • No credit card required for demo booking • Cancel anytime
           </p>
         </div>
       </section>

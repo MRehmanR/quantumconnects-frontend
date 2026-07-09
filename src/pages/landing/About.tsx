@@ -48,7 +48,7 @@ export default function About() {
               </p>
               <Button asChild className="bg-primary hover:bg-primary/90">
                 <Link to="/signup">
-                  Start Your Free Trial
+                  Book a Demo
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Link>
               </Button>
@@ -181,7 +181,7 @@ export default function About() {
           </p>
           <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
             <Link to="/signup">
-              Start Your Free Trial
+              Book a Demo
               <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </Button>

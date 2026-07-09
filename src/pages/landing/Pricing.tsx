@@ -107,7 +107,7 @@ export default function Pricing() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
               <Zap className="h-3.5 w-3.5" />
-              7-day trial, no card required
+              live demo, demo available
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-3 md:mb-5">
               Simple, Transparent Pricing
@@ -288,7 +288,7 @@ export default function Pricing() {
         <div className="container text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-3">Ready to Transform Your Business?</h2>
           <p className="mx-auto mb-8 max-w-2xl text-blue-100">
-            Start your free trial and see how Quantum Connects improves every customer call.
+            Book a demo and see how Quantum Connects improves every customer call.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <Link to="/book-demo" className="w-full sm:w-auto">
@@ -302,7 +302,7 @@ export default function Pricing() {
                 size="lg"
                 className="w-full border-2 border-white bg-transparent text-white hover:bg-white/10"
               >
-                Start Free Trial
+                Book a Demo
               </Button>
             </Link>
           </div>

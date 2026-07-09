@@ -205,12 +205,12 @@ export default function Blog() {
             Ready to Transform Your Business?
           </h2>
           <p className="text-lg mb-8 text-blue-100 max-w-2xl mx-auto">
-            Start your free trial today and see how Quantum Connects can
+            Book a demo today and see how Quantum Connects can
             revolutionize your customer communication.
           </p>
           <Button asChild size="lg" className="bg-white text-primary hover:bg-blue-50">
             <Link to="/signup">
-              Start Your Free Trial
+              Book a Demo
               <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </Button>

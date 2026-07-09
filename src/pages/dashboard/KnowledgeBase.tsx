@@ -330,7 +330,7 @@ export default function KnowledgeBase() {
                   <p className="text-muted-foreground">
                     AI Receptionist - Voice: {VOICE_OPTIONS.find((voice) => voice.id === config.voice)?.label || config.voice}
                   </p>
-                  <span className="mt-1 inline-flex rounded-full bg-amber-500/20 text-amber-500 px-3 py-1 text-xs font-semibold">7-day trial</span>
+                  <span className="mt-1 inline-flex rounded-full bg-amber-500/20 text-amber-500 px-3 py-1 text-xs font-semibold">live demo</span>
                 </div>
               </div>
 

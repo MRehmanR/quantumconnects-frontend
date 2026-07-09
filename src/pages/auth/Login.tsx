@@ -5,6 +5,7 @@ import { Zap, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { authApi } from "@/lib/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,60 +19,54 @@ export default function Login() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const payload = await res.json().catch(() => null);
-      if (!res.ok || !payload?.data?.token || !payload?.data?.user?.role) {
-        throw new Error(payload?.message || "Invalid email or password");
+      const payload = await authApi.login(form);
+      if (!payload?.token || !payload?.user?.role) {
+        throw new Error("Invalid email or password");
       }
 
-      const email = payload.data.user.email || form.email;
-      localStorage.setItem("qc_auth_token", payload.data.token);
-      localStorage.setItem("qc_user_role", payload.data.user.role);
-      if (payload?.data?.user?.username) {
-        localStorage.setItem("qc_user_name", payload.data.user.username);
+      const email = payload.user.email || form.email;
+      localStorage.setItem("qc_auth_token", payload.token);
+      localStorage.setItem("qc_user_role", payload.user.role);
+      if (payload?.user?.username) {
+        localStorage.setItem("qc_user_name", payload.user.username);
       }
       if (email) {
         localStorage.setItem("qc_user_email", email);
       }
-      if (payload?.data?.user?.businessName) {
-        localStorage.setItem("qc_business_name", payload.data.user.businessName);
+      if (payload?.user?.businessName) {
+        localStorage.setItem("qc_business_name", payload.user.businessName);
       }
-      if (payload?.data?.user?.ownerPhone) {
-        localStorage.setItem("qc_owner_phone", payload.data.user.ownerPhone);
+      if (payload?.user?.ownerPhone) {
+        localStorage.setItem("qc_owner_phone", payload.user.ownerPhone);
       }
-      if (payload?.data?.user?.inboundNumber) {
-        localStorage.setItem("qc_inbound_number", payload.data.user.inboundNumber);
+      if (payload?.user?.inboundNumber) {
+        localStorage.setItem("qc_inbound_number", payload.user.inboundNumber);
       } else {
         localStorage.removeItem("qc_inbound_number");
       }
-      if (payload?.data?.user?.retellAgentId) {
-        localStorage.setItem("qc_retell_agent_id", payload.data.user.retellAgentId);
+      if (payload?.user?.retellAgentId) {
+        localStorage.setItem("qc_retell_agent_id", payload.user.retellAgentId);
       } else {
         localStorage.removeItem("qc_retell_agent_id");
       }
-      if (payload?.data?.user?.provisioningStatus) {
-        localStorage.setItem("qc_provisioning_status", payload.data.user.provisioningStatus);
+      if (payload?.user?.provisioningStatus) {
+        localStorage.setItem("qc_provisioning_status", payload.user.provisioningStatus);
       } else {
         localStorage.removeItem("qc_provisioning_status");
       }
-      if (payload?.data?.user?.timezone) {
-        localStorage.setItem("qc_user_timezone", payload.data.user.timezone);
+      if (payload?.user?.timezone) {
+        localStorage.setItem("qc_user_timezone", payload.user.timezone);
       }
-      if (payload?.data?.user?.referralCode) {
-        localStorage.setItem("qc_referral_code", payload.data.user.referralCode);
+      if (payload?.user?.referralCode) {
+        localStorage.setItem("qc_referral_code", payload.user.referralCode);
       }
-      if (payload.data.user.role === "admin") {
+      if (payload.user.role === "admin") {
         navigate("/admin");
       } else {
-        navigate(payload?.data?.user?.inboundNumber ? "/dashboard" : "/onboarding/setup");
+        navigate(payload?.user?.inboundNumber ? "/dashboard" : "/onboarding/setup");
       }
     } catch (err: any) {
-      setError(err?.message || "Login failed");
+      setError(err?.message || "Sign in failed");
     } finally {
       setLoading(false);
     }

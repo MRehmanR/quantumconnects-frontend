@@ -190,7 +190,7 @@ export default function LandingChatbot() {
       {
         id: crypto.randomUUID(),
         type: "bot",
-        text: `Excellent. Here's what I found:\n\nYour situation:\n- You're likely missing about ${missedCalls} calls/month\n- That's roughly £${monthlyLoss.toLocaleString()} lost monthly\n- Or £${annualLoss.toLocaleString()} per year\n\nRecommendation:\nThe ${recommendation} plan (£${planPrice}/month) fits your volume best.\n\nROI estimate:\nYou could recover your plan cost in about ${paybackDays} days.\n\nReady to start your free 7-day trial?`,
+        text: `Excellent. Here's what I found:\n\nYour situation:\n- You're likely missing about ${missedCalls} calls/month\n- That's roughly £${monthlyLoss.toLocaleString()} lost monthly\n- Or £${annualLoss.toLocaleString()} per year\n\nRecommendation:\nThe ${recommendation} plan (£${planPrice}/month) fits your volume best.\n\nROI estimate:\nYou could recover your plan cost in about ${paybackDays} days.\n\nReady to start your live demo?`,
       },
     ]);
 
@@ -296,7 +296,7 @@ export default function LandingChatbot() {
         {!isCollectingContact && currentQuestionIndex >= QUESTIONS.length ? (
           <div className="space-y-2 mt-3">
             <Button onClick={() => (window.location.href = "/signup")} className="w-full bg-primary hover:bg-primary/90" size="sm">
-              Start Free Trial
+              Book a Demo
             </Button>
             <Button variant="outline" onClick={() => setIsOpen(false)} className="w-full" size="sm">
               Close

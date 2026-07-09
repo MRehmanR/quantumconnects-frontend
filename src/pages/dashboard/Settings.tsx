@@ -474,7 +474,7 @@ export default function Settings() {
               <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
                 <div className="card-surface p-6">
                   <h3 className="text-sm font-semibold text-foreground">Referral System</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">Share your code or link. When a referred user buys a plan, you get 20 bonus minutes for 7 days.</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Share your code or link. When a referred user buys a plan, you get a limited-time 20 minute bonus.</p>
 
                   <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="rounded-lg border border-border p-3">

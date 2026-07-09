@@ -18,7 +18,7 @@ const QUICK_ACTIONS = [
 
 function buildRouteTip(pathname: string): string {
   if (pathname === "/" || pathname.startsWith("/features") || pathname.startsWith("/pricing")) {
-    return "You are on a marketing page. Use Login or Start Free Trial to access the application.";
+    return "You are on a marketing page. Use Login or Book a Demo to access the application.";
   }
 
   if (pathname.startsWith("/login")) {
