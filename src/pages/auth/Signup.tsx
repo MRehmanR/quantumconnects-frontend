@@ -69,8 +69,9 @@ export default function Signup() {
     setError("");
     setLoadingStep("Creating account...");
     localStorage.removeItem("qc_inbound_number");
+    localStorage.removeItem("qc_user_id");
     try {
-      const payloadData: any = await authApi.signup({
+      const payloadData = await authApi.signup({
         name: form.name,
         email: form.email,
         password: form.password,
@@ -88,6 +89,9 @@ export default function Signup() {
       }
       if (payloadData?.role) {
         localStorage.setItem("qc_user_role", payloadData.role);
+      }
+      if (payloadData?.id) {
+        localStorage.setItem("qc_user_id", String(payloadData.id));
       }
       if (payloadData?.username) {
         localStorage.setItem("qc_user_name", payloadData.username);
@@ -141,8 +145,8 @@ export default function Signup() {
 
       setLoadingStep("Finalizing dashboard...");
       navigate("/dashboard");
-    } catch (err: any) {
-      setError(err?.message || "Signup failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Signup failed");
     } finally {
       setLoadingStep("");
       setLoading(false);

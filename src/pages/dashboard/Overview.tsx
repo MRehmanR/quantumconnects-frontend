@@ -186,6 +186,7 @@ export default function DashboardOverview() {
           <LiveDataStatus
             dataUpdatedAt={dataUpdatedAt}
             isRefreshing={isFetching && !loading}
+            hasError={Boolean(overviewError)}
             onRefresh={() => void refetch()}
           />
         </div>

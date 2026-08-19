@@ -2,7 +2,11 @@ import type { ReactNode } from "react";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LIVE_DASHBOARD_REFRESH_MS, useLiveDashboardQuery } from "./use-live-dashboard-query";
+import {
+  LIVE_DASHBOARD_REFRESH_MS,
+  tenantScopedDashboardKey,
+  useLiveDashboardQuery,
+} from "./use-live-dashboard-query";
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -16,6 +20,7 @@ const createWrapper = () => {
 
 afterEach(() => {
   vi.useRealTimers();
+  localStorage.clear();
 });
 
 describe("useLiveDashboardQuery", () => {
@@ -53,5 +58,16 @@ describe("useLiveDashboardQuery", () => {
     );
 
     await waitFor(() => expect(loader).toHaveBeenCalledTimes(1));
+  });
+
+  it("uses separate cache keys for different authenticated tenants", () => {
+    localStorage.setItem("qc_user_id", "tenant-a");
+    const tenantAKey = tenantScopedDashboardKey(["dashboard", "calls"]);
+    localStorage.setItem("qc_user_id", "tenant-b");
+    const tenantBKey = tenantScopedDashboardKey(["dashboard", "calls"]);
+
+    expect(tenantAKey).toEqual(["tenant-dashboard", "tenant-a", "dashboard", "calls"]);
+    expect(tenantBKey).toEqual(["tenant-dashboard", "tenant-b", "dashboard", "calls"]);
+    expect(tenantBKey).not.toEqual(tenantAKey);
   });
 });

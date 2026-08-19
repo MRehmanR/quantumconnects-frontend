@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Phone, PlayCircle, FileText, ChevronDown } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
@@ -21,9 +21,15 @@ const statusColors: Record<string, string> = {
 
 export default function CallLogs() {
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [expanded, setExpanded] = useState<string | null>(null);
   const queryFilter = filter === "All" ? "" : filter;
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(search.trim()), 300);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
   const {
     data: calls = [],
     dataUpdatedAt,
@@ -32,8 +38,8 @@ export default function CallLogs() {
     isPending: loading,
     refetch,
   } = useLiveDashboardQuery<CallLogItem[]>({
-    queryKey: ["dashboard", "calls", search, queryFilter],
-    queryFn: () => callsApi.getAll({ search: search || undefined, filter: queryFilter || undefined }),
+    queryKey: ["dashboard", "calls", debouncedSearch, queryFilter],
+    queryFn: () => callsApi.getAll({ search: debouncedSearch || undefined, filter: queryFilter || undefined }),
   });
 
   const filters = ["All", "Completed", "Escalated", "Missed"];
@@ -73,6 +79,7 @@ export default function CallLogs() {
             <LiveDataStatus
               dataUpdatedAt={dataUpdatedAt}
               isRefreshing={isFetching && !loading}
+              hasError={Boolean(error)}
               onRefresh={() => void refetch()}
             />
           </div>
@@ -156,10 +163,28 @@ export default function CallLogs() {
                     exit={{ height: 0, opacity: 0 }}
                     className="px-5 pb-4 bg-muted/20 border-t border-border"
                   >
+                    {call.summary ? (
+                      <p className="text-xs text-muted-foreground leading-relaxed pt-3">
+                        <span className="font-semibold text-foreground">AI summary: </span>
+                        {call.summary}
+                      </p>
+                    ) : null}
                     <p className="text-xs text-muted-foreground leading-relaxed pt-3">
                       <span className="font-semibold text-foreground">Transcript: </span>
-                      {call.transcript}
+                      {call.transcript || "No transcript was provided."}
                     </p>
+                    {call.disconnectionReason ? (
+                      <p className="pt-2 text-xs text-muted-foreground">
+                        <span className="font-semibold text-foreground">Ended: </span>
+                        {call.disconnectionReason.replaceAll("_", " ")}
+                      </p>
+                    ) : null}
+                    {call.callSuccessful !== null && call.callSuccessful !== undefined ? (
+                      <p className="pt-2 text-xs text-muted-foreground">
+                        <span className="font-semibold text-foreground">Outcome: </span>
+                        {call.callSuccessful ? "Successful" : "Needs follow-up"}
+                      </p>
+                    ) : null}
                   </motion.div>
                 )}
               </div>

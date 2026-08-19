@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { normalizePhoneForSubmit } from "@/lib/phone";
 import LiveDataStatus from "@/components/dashboard/LiveDataStatus";
-import { useLiveDashboardQuery } from "@/hooks/use-live-dashboard-query";
+import { tenantScopedDashboardKey, useLiveDashboardQuery } from "@/hooks/use-live-dashboard-query";
 
 const APPOINTMENTS_QUERY_KEY = ["dashboard", "appointments"] as const;
 
@@ -147,7 +147,7 @@ export default function Appointments() {
   };
 
   const applyLocalStatus = (appointmentId: string, status: AppointmentItem["status"]) => {
-    queryClient.setQueryData<AppointmentItem[]>(APPOINTMENTS_QUERY_KEY, (current = []) =>
+    queryClient.setQueryData<AppointmentItem[]>(tenantScopedDashboardKey(APPOINTMENTS_QUERY_KEY), (current = []) =>
       current.map((appointment) => (appointment.id === appointmentId ? { ...appointment, status } : appointment)),
     );
   };
@@ -252,6 +252,7 @@ export default function Appointments() {
           <LiveDataStatus
             dataUpdatedAt={dataUpdatedAt}
             isRefreshing={isFetching && !loading}
+            hasError={Boolean(appointmentsError)}
             onRefresh={() => void refetch()}
           />
         </div>

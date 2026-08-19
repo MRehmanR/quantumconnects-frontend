@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 type LiveDataStatusProps = {
   dataUpdatedAt: number;
   isRefreshing: boolean;
+  hasError?: boolean;
   onRefresh: () => void;
 };
 
-export default function LiveDataStatus({ dataUpdatedAt, isRefreshing, onRefresh }: LiveDataStatusProps) {
+export default function LiveDataStatus({ dataUpdatedAt, isRefreshing, hasError = false, onRefresh }: LiveDataStatusProps) {
   const updatedLabel = dataUpdatedAt
     ? new Date(dataUpdatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })
     : "Waiting for data";
@@ -15,8 +16,8 @@ export default function LiveDataStatus({ dataUpdatedAt, isRefreshing, onRefresh 
   return (
     <div className="flex items-center gap-2 text-xs text-muted-foreground" aria-live="polite">
       <span className="inline-flex items-center gap-1.5">
-        <span className="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
-        Live
+        <span className={`h-2 w-2 rounded-full ${hasError ? "bg-destructive" : "bg-accent"}`} aria-hidden="true" />
+        {hasError ? "Update delayed" : "Live"}
       </span>
       <span className="hidden sm:inline">{isRefreshing ? "Updating…" : `Updated ${updatedLabel}`}</span>
       <Button

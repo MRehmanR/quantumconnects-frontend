@@ -18,6 +18,10 @@ export type CallLogItem = {
   sentiment: "Positive" | "Neutral" | "Negative";
   status: "Completed" | "Escalated" | "Missed";
   transcript: string;
+  summary?: string;
+  callSuccessful?: boolean | null;
+  disconnectionReason?: string;
+  endedAt?: string | null;
 };
 
 export type AppointmentItem = {
@@ -167,7 +171,7 @@ export type DemoBookingPayload = {
   currentSystem?: string;
   timeline?: string;
   timezone?: string;
-  geoLocation?: Record<string, any>;
+  geoLocation?: Record<string, unknown>;
   time: string;
 };
 
@@ -349,7 +353,7 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
     }
 
     return payload as T;
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error && error.message) {
       const networkMessage =
         error.message.includes("Failed to fetch") || error.message.includes("NetworkError")
@@ -449,7 +453,7 @@ export type AiReceptionistConfigData = {
   scheduleMode: "always_on" | "custom";
   weeklySchedule: AiReceptionistScheduleRow[];
   faqActiveMap: Record<string, boolean>;
-  bookingRules: Record<string, any>;
+  bookingRules: Record<string, unknown>;
   isActiveNow: boolean;
   timezone: string;
 };

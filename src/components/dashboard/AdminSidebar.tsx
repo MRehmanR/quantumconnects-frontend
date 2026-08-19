@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Users, CreditCard, BarChart3, LogOut, Zap, ChevronLeft, ChevronRight, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/admin" },
@@ -26,10 +27,13 @@ export default function AdminSidebar({
 }: AdminSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const handleSignOut = () => {
+    queryClient.clear();
     localStorage.removeItem("qc_auth_token");
     localStorage.removeItem("qc_user_role");
+    localStorage.removeItem("qc_user_id");
     localStorage.removeItem("qc_user_email");
     localStorage.removeItem("qc_referral_code");
     localStorage.removeItem("qc_inbound_number");

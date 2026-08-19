@@ -27,6 +27,11 @@ export default function Login() {
       const email = payload.user.email || form.email;
       localStorage.setItem("qc_auth_token", payload.token);
       localStorage.setItem("qc_user_role", payload.user.role);
+      if (payload.user.id) {
+        localStorage.setItem("qc_user_id", String(payload.user.id));
+      } else {
+        localStorage.removeItem("qc_user_id");
+      }
       if (payload?.user?.username) {
         localStorage.setItem("qc_user_name", payload.user.username);
       }
@@ -65,8 +70,8 @@ export default function Login() {
       } else {
         navigate(payload?.user?.inboundNumber ? "/dashboard" : "/onboarding/setup");
       }
-    } catch (err: any) {
-      setError(err?.message || "Sign in failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Sign in failed");
     } finally {
       setLoading(false);
     }
@@ -187,4 +192,3 @@ export default function Login() {
     </div>
   );
 }
-
