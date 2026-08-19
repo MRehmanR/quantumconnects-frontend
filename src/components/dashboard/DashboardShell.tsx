@@ -64,7 +64,7 @@ export default function DashboardShell({ children }: DashboardShellProps) {
       {/* Main */}
       <div
         className={cn(
-          "flex-1 flex flex-col transition-all duration-200",
+          "min-w-0 flex-1 flex flex-col transition-all duration-200",
           isMobile ? "ml-0" : collapsed ? "md:ml-16" : "md:ml-72"
         )}
       >

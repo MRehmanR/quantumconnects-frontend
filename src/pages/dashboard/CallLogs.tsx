@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Phone, PlayCircle, FileText, ChevronDown } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { Input } from "@/components/ui/input";
 import { callsApi, type CallLogItem } from "@/lib/api";
+import LiveDataStatus from "@/components/dashboard/LiveDataStatus";
+import { useLiveDashboardQuery } from "@/hooks/use-live-dashboard-query";
 
 const sentimentColors: Record<string, string> = {
   Positive: "status-completed",
@@ -21,25 +23,18 @@ export default function CallLogs() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [calls, setCalls] = useState<CallLogItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const run = async () => {
-      setLoading(true);
-      try {
-        const data = await callsApi.getAll({
-          search: search || undefined,
-          filter: filter === "All" ? undefined : filter,
-        });
-        setCalls(data);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    run();
-  }, [search, filter]);
+  const queryFilter = filter === "All" ? "" : filter;
+  const {
+    data: calls = [],
+    dataUpdatedAt,
+    error,
+    isFetching,
+    isPending: loading,
+    refetch,
+  } = useLiveDashboardQuery<CallLogItem[]>({
+    queryKey: ["dashboard", "calls", search, queryFilter],
+    queryFn: () => callsApi.getAll({ search: search || undefined, filter: queryFilter || undefined }),
+  });
 
   const filters = ["All", "Completed", "Escalated", "Missed"];
 
@@ -74,8 +69,16 @@ export default function CallLogs() {
               </button>
             ))}
           </div>
+          <div className="sm:ml-auto">
+            <LiveDataStatus
+              dataUpdatedAt={dataUpdatedAt}
+              isRefreshing={isFetching && !loading}
+              onRefresh={() => void refetch()}
+            />
+          </div>
         </div>
 
+        {error ? <p className="text-xs text-destructive">{error.message || "Failed to load call logs"}</p> : null}
         {/* Table */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}

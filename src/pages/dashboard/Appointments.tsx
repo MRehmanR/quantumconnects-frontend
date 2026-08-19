@@ -1,12 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Calendar, Clock, User, CheckCircle, Circle, RefreshCw, Link2 } from "lucide-react";
+import { Calendar, Clock, User, CheckCircle, Circle, Link2 } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { appointmentsApi, type AppointmentItem } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { normalizePhoneForSubmit } from "@/lib/phone";
+import LiveDataStatus from "@/components/dashboard/LiveDataStatus";
+import { useLiveDashboardQuery } from "@/hooks/use-live-dashboard-query";
+
+const APPOINTMENTS_QUERY_KEY = ["dashboard", "appointments"] as const;
 
 const PHONE_COUNTRY_CODES = [
   { label: "United States (+1)", code: "+1" },
@@ -51,14 +56,15 @@ const statusConfig: Record<string, { color: string; icon: typeof CheckCircle }> 
 };
 
 const manualStatuses: AppointmentItem["status"][] = ["Pending", "Confirmed", "Completed", "Cancelled", "NoShow"];
+const errorMessage = (error: unknown, fallback: string) => error instanceof Error && error.message ? error.message : fallback;
 
 export default function Appointments() {
+  const queryClient = useQueryClient();
   const ownerName = localStorage.getItem("qc_user_name") || "User";
   const ownerEmail = localStorage.getItem("qc_user_email") || "";
   const ownerPhone = localStorage.getItem("qc_owner_phone") || "";
   const inboundNumber = localStorage.getItem("qc_inbound_number") || "";
 
-  const [appointments, setAppointments] = useState<AppointmentItem[]>([]);
   const [form, setForm] = useState({
     customerName: "",
     customerPhone: "",
@@ -69,9 +75,6 @@ export default function Appointments() {
   });
   const [saving, setSaving] = useState(false);
   const [busyAppointmentId, setBusyAppointmentId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loadError, setLoadError] = useState("");
   const [notificationWarning, setNotificationWarning] = useState("");
   const [formError, setFormError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
@@ -84,37 +87,17 @@ export default function Appointments() {
     )
   );
 
-  const loadAppointments = useCallback(async (showLoading = false) => {
-    if (showLoading) {
-      setLoading(true);
-    } else {
-      setRefreshing(true);
-    }
-
-    try {
-      const data = await appointmentsApi.getAll();
-      setAppointments(data || []);
-      setLoadError("");
-    } catch (error: any) {
-      setLoadError(error?.message || "Failed to load appointments");
-    } finally {
-      if (showLoading) {
-        setLoading(false);
-      } else {
-        setRefreshing(false);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    loadAppointments(true);
-
-    const intervalId = setInterval(() => {
-      loadAppointments(false);
-    }, 15000);
-
-    return () => clearInterval(intervalId);
-  }, [loadAppointments]);
+  const {
+    data: appointments = [],
+    dataUpdatedAt,
+    error: appointmentsError,
+    isFetching,
+    isPending: loading,
+    refetch,
+  } = useLiveDashboardQuery<AppointmentItem[]>({
+    queryKey: APPOINTMENTS_QUERY_KEY,
+    queryFn: appointmentsApi.getAll,
+  });
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,7 +130,7 @@ export default function Appointments() {
       } else {
         setNotificationWarning("");
       }
-      await loadAppointments(false);
+      await refetch();
       setForm({
         customerName: "",
         customerPhone: "",
@@ -156,22 +139,24 @@ export default function Appointments() {
         time: "",
         type: "Consultation",
       });
-    } catch (error: any) {
-      setFormError(error?.message || "Failed to create appointment");
+    } catch (error: unknown) {
+      setFormError(errorMessage(error, "Failed to create appointment"));
     } finally {
       setSaving(false);
     }
   };
 
   const applyLocalStatus = (appointmentId: string, status: AppointmentItem["status"]) => {
-    setAppointments((prev) => prev.map((appt) => (appt.id === appointmentId ? { ...appt, status } : appt)));
+    queryClient.setQueryData<AppointmentItem[]>(APPOINTMENTS_QUERY_KEY, (current = []) =>
+      current.map((appointment) => (appointment.id === appointmentId ? { ...appointment, status } : appointment)),
+    );
   };
 
   const handleCancel = async (appointmentId: string) => {
     setBusyAppointmentId(appointmentId);
     try {
       await appointmentsApi.cancel(appointmentId);
-      await loadAppointments(false);
+      await refetch();
     } finally {
       setBusyAppointmentId(null);
     }
@@ -182,7 +167,7 @@ export default function Appointments() {
     try {
       const updated = await appointmentsApi.updateStatus(appointmentId, nextStatus);
       applyLocalStatus(appointmentId, updated.status);
-      await loadAppointments(false);
+      await refetch();
     } finally {
       setBusyAppointmentId(null);
     }
@@ -219,9 +204,9 @@ export default function Appointments() {
       } else {
         setActionMessage("Deposit link created.");
       }
-      await loadAppointments(false);
-    } catch (error: any) {
-      setActionMessage(error?.message || "Failed to create deposit link");
+      await refetch();
+    } catch (error: unknown) {
+      setActionMessage(errorMessage(error, "Failed to create deposit link"));
     } finally {
       setBusyAppointmentId(null);
     }
@@ -233,9 +218,9 @@ export default function Appointments() {
     try {
       const data = await appointmentsApi.refreshDepositStatus(appointmentId);
       setActionMessage(`Payment status: ${data.paymentStatus}`);
-      await loadAppointments(false);
-    } catch (error: any) {
-      setActionMessage(error?.message || "Failed to refresh deposit status");
+      await refetch();
+    } catch (error: unknown) {
+      setActionMessage(errorMessage(error, "Failed to refresh deposit status"));
     } finally {
       setBusyAppointmentId(null);
     }
@@ -264,14 +249,15 @@ export default function Appointments() {
       <div className="max-w-5xl mx-auto space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-foreground">Appointments</h2>
-          <Button type="button" size="sm" variant="outline" className="h-8 text-xs" onClick={() => loadAppointments(false)} disabled={refreshing}>
-            <RefreshCw className={`mr-1 h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
-            {refreshing ? "Refreshing..." : "Refresh"}
-          </Button>
+          <LiveDataStatus
+            dataUpdatedAt={dataUpdatedAt}
+            isRefreshing={isFetching && !loading}
+            onRefresh={() => void refetch()}
+          />
         </div>
 
         {loading && <p className="text-xs text-muted-foreground">Loading appointments...</p>}
-        {!loading && loadError && <p className="text-xs text-destructive">{loadError}</p>}
+        {!loading && appointmentsError && <p className="text-xs text-destructive">{appointmentsError.message || "Failed to load appointments"}</p>}
         {notificationWarning && <p className="text-xs text-destructive">{notificationWarning}</p>}
         {formError && <p className="text-xs text-destructive">{formError}</p>}
         {actionMessage && <p className="text-xs text-primary">{actionMessage}</p>}

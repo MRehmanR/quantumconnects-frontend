@@ -7,8 +7,11 @@ import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Respons
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import LiveDataStatus from "@/components/dashboard/LiveDataStatus";
+import { useLiveDashboardQuery } from "@/hooks/use-live-dashboard-query";
 
 type PerformanceRange = "weekly" | "monthly" | "custom";
+const errorMessage = (error: unknown, fallback: string) => error instanceof Error && error.message ? error.message : fallback;
 
 const mockDailyPerformance: DashboardOverviewData["dailyPerformance"] = [
   { date: "Mon", calls: 12, bookings: 4, revenue: 180 },
@@ -55,8 +58,6 @@ export default function DashboardOverview() {
   const weeklyStartDate = `${weeklyStart.getFullYear()}-${String(weeklyStart.getMonth() + 1).padStart(2, "0")}-${String(
     weeklyStart.getDate()
   ).padStart(2, "0")}`;
-  const [overview, setOverview] = useState<DashboardOverviewData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<DailySummaryData | null>(null);
   const [summaryHistory, setSummaryHistory] = useState<DailySummaryHistoryItem[]>([]);
   const [summaryLoading, setSummaryLoading] = useState(false);
@@ -66,36 +67,34 @@ export default function DashboardOverview() {
   const [customStartDate, setCustomStartDate] = useState(weeklyStartDate);
   const [customEndDate, setCustomEndDate] = useState(todayDate);
 
+  const customRangeIsValid = performanceRange !== "custom"
+    || Boolean(customStartDate && customEndDate && customStartDate <= customEndDate);
+  const overviewQuery = performanceRange === "custom"
+    ? { range: "custom" as const, startDate: customStartDate, endDate: customEndDate }
+    : { range: performanceRange as "weekly" | "monthly" };
+  const {
+    data: overview,
+    dataUpdatedAt,
+    error: overviewError,
+    isFetching,
+    isPending: loading,
+    refetch,
+  } = useLiveDashboardQuery<DashboardOverviewData>({
+    queryKey: ["dashboard", "overview", performanceRange, customStartDate, customEndDate],
+    queryFn: () => dashboardApi.getOverview(overviewQuery),
+    enabled: customRangeIsValid,
+  });
+
   useEffect(() => {
-    const run = async () => {
-      setLoading(true);
-      try {
-        const query =
-          performanceRange === "custom"
-            ? { range: "custom" as const, startDate: customStartDate, endDate: customEndDate }
-            : { range: performanceRange as "weekly" | "monthly" };
-
-        if (performanceRange === "custom" && (!customStartDate || !customEndDate || customStartDate > customEndDate)) {
-          return;
-        }
-
-        const data = await dashboardApi.getOverview(query);
-
-        if (data.businessNumber) {
-          localStorage.setItem("qc_inbound_number", data.businessNumber);
-        }
-        setOverview(data);
-        localStorage.setItem("qc_calls_used", String(data.callsUsed || 0));
-        localStorage.setItem("qc_calls_limit", String((data.callsUsed || 0) + (data.callsRemaining || 0)));
-      } catch {
-        setOverview(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    run();
-  }, [customEndDate, customStartDate, performanceRange]);
+    if (!overview) {
+      return;
+    }
+    if (overview.businessNumber) {
+      localStorage.setItem("qc_inbound_number", overview.businessNumber);
+    }
+    localStorage.setItem("qc_calls_used", String(overview.callsUsed || 0));
+    localStorage.setItem("qc_calls_limit", String((overview.callsUsed || 0) + (overview.callsRemaining || 0)));
+  }, [overview]);
 
   useEffect(() => {
     const run = async () => {
@@ -123,8 +122,8 @@ export default function DashboardOverview() {
       setSummary(data);
       const history = await summaryApi.getHistory({ limit: 30 });
       setSummaryHistory(history || []);
-    } catch (error: any) {
-      setSummaryError(error?.message || "Failed to generate summary");
+    } catch (error: unknown) {
+      setSummaryError(errorMessage(error, "Failed to generate summary"));
     } finally {
       setSummaryLoading(false);
     }
@@ -183,7 +182,16 @@ export default function DashboardOverview() {
   return (
     <DashboardShell>
       <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex justify-end">
+          <LiveDataStatus
+            dataUpdatedAt={dataUpdatedAt}
+            isRefreshing={isFetching && !loading}
+            onRefresh={() => void refetch()}
+          />
+        </div>
         {loading && <p className="text-sm text-muted-foreground">Loading dashboard data...</p>}
+        {overviewError ? <p className="text-sm text-destructive">{overviewError.message || "Failed to load dashboard data"}</p> : null}
+        {!customRangeIsValid ? <p className="text-sm text-destructive">Select a valid custom date range.</p> : null}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, i) => (
