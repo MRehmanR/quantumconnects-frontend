@@ -6,9 +6,9 @@
 
 ## Objective
 
-Deliver a production-shaped inbound call path for the existing Hampton Travel RetellAI number ending `6408`. A caller must reach the correct Hampton Travel agent, receive answers based on that business's instructions and knowledge, perform appointment operations during the call, and see the resulting call and appointment data in the existing Quantum Connects dashboard.
+Deliver a production-shaped, multi-tenant inbound call system for the Quantum Connects SaaS application. Every registered business must be resolved dynamically from the number that the caller dialed, receive its own Retell agent/instructions/knowledge/configuration, perform tenant-scoped appointment operations during the call, and see only its own resulting call and appointment data in the existing dashboard.
 
-The first release must also establish a reusable tenant-by-number contract so the same implementation can be applied to the other Retell numbers without duplicating business logic.
+The Hampton Travel RetellAI number ending `6408` is the first real-call acceptance tenant. It is not a hard-coded product path, default tenant, or special case. The same code and workflow definitions must serve all registered businesses by data-driven number-to-tenant resolution.
 
 ## Current State
 
@@ -21,11 +21,11 @@ The first release must also establish a reusable tenant-by-number contract so th
 - The backend already exposes partial automation and appointment APIs, but its Retell event parsing and signature verification do not match Retell's current payload/signature contract.
 - n8n Cloud is reachable. The supplied workflow files contain inconsistent local/ngrok backend fallbacks and Workflow 11 drops nested booking, reschedule, cancellation, and real Retell call fields.
 - The frontend already renders call logs and appointments. Appointments poll every 15 seconds; Overview and Call Logs do not consistently poll.
-- The local backend database contains no Hampton Travel tenant. A real call test therefore requires an explicit Hampton Travel user-to-number-to-agent mapping in the test/deployed database.
+- The local backend database contains no Hampton Travel tenant. A real call test therefore requires an explicit tenant fixture or synchronized user-to-number-to-agent record in the test database; production routing still uses ordinary registered-business records.
 
 ## Architectural Decision
 
-Use a backend-first, n8n-assisted architecture.
+Use a multi-tenant backend-first, n8n-assisted architecture.
 
 The backend is the synchronous security and data boundary for Retell. n8n performs asynchronous orchestration and notifications. Retell and n8n never write directly to the application database.
 
@@ -56,6 +56,8 @@ Responsibilities:
 
 Versioned source location after integration: `../quantumconnectsio_backend/automation/n8n`
 
+Test runtime: a local n8n process started from the repository-pinned command. n8n Cloud is the deployment target only after local workflow and end-to-end validation passes.
+
 Responsibilities:
 
 - Usage threshold alerts.
@@ -66,6 +68,27 @@ Responsibilities:
 - Workflow execution telemetry and operational retries.
 
 n8n must call backend APIs with `x-automation-key`. It must not contain a database credential or write SQL.
+
+Every workflow execution must receive or resolve an explicit tenant identity. Static tenant arrays, a default tenant email, and hard-coded business numbers are prohibited.
+
+The canonical backend-to-n8n job envelope is:
+
+```json
+{
+  "jobType": "appointment.booked",
+  "jobId": "stable-idempotency-key",
+  "tenant": {
+    "id": "database-user-id",
+    "email": "business-account-email",
+    "inboundNumber": "normalized-business-number",
+    "timezone": "IANA-timezone"
+  },
+  "occurredAt": "ISO-8601-timestamp",
+  "payload": {}
+}
+```
+
+n8n treats the tenant object as routing context and sends it back to protected backend operations. Backend endpoints still re-resolve and authorize the tenant rather than trusting workflow input alone.
 
 ### Frontend
 
@@ -83,23 +106,37 @@ Responsibilities:
 
 - Receive the phone call and provide speech/LLM execution.
 - Call the backend inbound webhook before connecting the call.
-- Use the existing Hampton Travel prompt plus backend tools.
+- Use each resolved tenant's business-specific prompt plus shared backend tools; preserve the existing Hampton Travel prompt during the canary.
 - Send signed custom-function and call-event requests to the backend.
+
+## SaaS Provisioning and Tenant Lifecycle
+
+The live-call integration is part of normal account provisioning, not a manual operation performed for each business.
+
+1. A registered business purchases/imports a unique inbound number and provisions a Retell agent through the existing onboarding APIs.
+2. The backend stores the unique normalized inbound number and Retell agent ID on that business's user record.
+3. The provisioning service configures the phone's inbound webhook, the agent's event webhook, and the Retell LLM tool definitions from `PUBLIC_API_BASE_URL`.
+4. The agent prompt remains business-specific, while tool definitions and backend routes remain shared across all tenants.
+5. Updating business settings, booking rules, or knowledge changes backend data used by tools; it does not require cloning workflows.
+6. Re-provisioning is idempotent and updates only the selected business's Retell resources.
+7. Suspending a tenant causes inbound preflight to apply that tenant's configured reject/fallback behavior without affecting other businesses.
+
+An admin-only reconciliation command audits existing business records against Retell phone/agent configuration and can backfill missing webhooks/tools. It supports a dry-run mode and a single-tenant filter. The first execution targets Hampton Travel; later executions can safely cover all registered businesses.
 
 ## End-to-End Call Flow
 
-1. A caller dials the Hampton Travel number ending `6408`.
+1. A caller dials any business number provisioned by Quantum Connects. The first acceptance run uses the Hampton Travel number ending `6408`.
 2. Retell sends `call_inbound` to `POST /api/automation/retell/inbound`.
 3. The backend verifies the Retell signature against the exact raw body.
 4. The backend extracts `call_inbound.to_number` and `call_inbound.from_number`, normalizes both, and resolves the tenant by the exact inbound number.
 5. The backend runs an idempotent call preflight reservation. Retell retries use the signature timestamp plus from/to numbers as the reservation identity, preventing duplicate usage increments.
-6. If the tenant is valid and allowed, the backend returns:
+6. If the tenant is valid and allowed, the backend returns data from that tenant record:
 
-   - `override_agent_id` for the Hampton Travel agent;
+   - `override_agent_id` for the resolved business's Retell agent;
    - string-only dynamic variables for business name, tenant identifier, caller number, owner/escalation number, timezone, greeting, and active booking rules;
    - metadata containing non-secret tenant and preflight identifiers.
 
-7. If the tenant is inactive or over limit, the response rejects the AI path or selects the configured fallback behavior. The existing bound agent remains Retell's availability fallback if the inbound webhook itself is temporarily unavailable.
+7. If the tenant is inactive or over limit, the response rejects the AI path or selects that tenant's configured fallback behavior. A bound agent may remain Retell's availability fallback if the inbound webhook itself is temporarily unavailable, but no tenant may fall back to another business's agent.
 8. During the conversation, the agent follows its existing prompt and calls backend tools whenever live data or a write is required.
 9. The backend commits appointment/call changes first, then triggers the relevant n8n webhook.
 10. Retell sends `call_started`, `call_ended`, and `call_analyzed` events to `POST /api/automation/retell/events`.
@@ -160,20 +197,20 @@ Deduplication key: `retell:<event>:<call_id>`. Call storage uses `call_id` as th
 
 ## n8n Workflow Integration
 
-The supplied workflows and Postman assets will be copied into the active backend repository and corrected there.
+The supplied workflows and Postman assets will be copied into the active backend repository and corrected there. The corrected files are first imported into local n8n, tested against the local backend/database, and exported from local n8n as the cloud-import artifacts.
 
 - **Workflow 11:** converted from an unsafe pseudo-Retell synchronous router into a canonical regression/fallback orchestrator that calls the same backend action contracts. It will understand real nested Retell/test payloads, but production live calls will use the signed backend ingress.
 - **Workflow 12:** receives usage threshold jobs emitted idempotently by backend preflight.
 - **Workflow 13:** receives durable appointment booked/rescheduled/cancelled/status-updated jobs.
-- **Workflow 14:** generates daily summaries per explicit tenant and timezone.
+- **Workflow 14:** obtains eligible tenants from a protected backend endpoint and generates daily summaries per explicit tenant and timezone. It does not use a static tenant list.
 - **Workflow 15:** receives eligible completed-appointment review jobs.
 - **Workflow 16:** handles waitlist replies and writes results through the backend.
 
-All workflow URLs must derive from `QC_BACKEND_BASE_URL`. Hard-coded localhost and expired ngrok defaults are removed. Required credentials remain n8n credentials/variables, never committed JSON values.
+All workflow URLs must derive from `QC_BACKEND_BASE_URL`. Local tests set it to the local backend origin; cloud import sets it to the production HTTPS backend origin. Hard-coded localhost fallbacks, tenant identifiers, phone numbers, and expired ngrok defaults are removed. Required credentials remain n8n credentials/variables, never committed JSON values.
 
 The Postman collection will test backend auth, inbound business resolution, booking, duplicate booking, reschedule, cancel, information lookup, unknown tenant, invalid signature, and n8n callback behavior. Dates will be generated at runtime so tests never expire.
 
-Deploying corrected workflows to n8n Cloud requires an n8n API key or an operator import/activation step. The repository will contain import-ready, validated JSON in either case.
+Local n8n is the mandatory workflow test gate. The repository's existing n8n launcher is used with a task-owned local data directory so tests do not alter unrelated n8n state. After local tests pass, the validated JSON is imported and activated in n8n Cloud by an operator. Cloud variables/credentials are configured separately, and a cloud smoke test must pass before Retell production webhooks are switched.
 
 ## Dashboard Synchronization
 
@@ -188,7 +225,7 @@ Deploying corrected workflows to n8n Cloud requires an n8n API key or an operato
 - Retell signature verification uses `RETELL_API_KEY`, the raw body plus signature timestamp, a five-minute replay window, and timing-safe digest comparison.
 - `RETELL_WEBHOOK_SECRET` is not used as a substitute for Retell's documented signature scheme.
 - n8n uses `AUTOMATION_SHARED_KEY` through the `x-automation-key` header.
-- Tenant identity comes from an exact normalized inbound number or signed call metadata; tenant email from arbitrary tool arguments is ignored.
+- Tenant identity comes from an exact normalized inbound number or signed call metadata; tenant email from arbitrary tool arguments is ignored. There is no default or first-user fallback for automation operations.
 - Knowledge base, appointments, calls, and contacts are tenant-scoped in every automation operation.
 - Side-effecting operations are idempotent because Retell and n8n can retry.
 - Secrets, full credentials, and real phone numbers are not committed to workflow JSON, Postman environments, logs, or frontend code.
@@ -207,7 +244,16 @@ Backend configuration adds or standardizes:
 - `N8N_WAITLIST_WEBHOOK_URL`.
 - `N8N_WORKFLOW_EXECUTION_WEBHOOK_URL` when telemetry is pushed to a dedicated workflow.
 
-Test-only Hampton Travel identifiers are supplied via environment variables or database records, not hard-coded application constants.
+Test-only Hampton Travel identifiers are supplied via environment variables or database fixtures, not hard-coded application constants. The test fixture goes through the same resolution path as every other tenant.
+
+Local n8n configuration uses task-owned values for:
+
+- `N8N_USER_FOLDER`: isolated local n8n state under a task-specific directory.
+- `QC_BACKEND_BASE_URL`: local backend origin.
+- `QC_AUTOMATION_KEY`: the local backend automation key.
+- `WEBHOOK_URL`: local/tunnel origin only when Retell must reach local n8n during a real-call test.
+
+Cloud import replaces environment-specific URLs and credentials through n8n Cloud variables/credentials; workflow JSON remains environment-neutral.
 
 ## Error Handling
 
@@ -227,6 +273,7 @@ Test-only Hampton Travel identifiers are supplied via environment variables or d
 - Signature parser, timestamp expiry, and HMAC verification.
 - Retell inbound payload normalization.
 - Exact number-to-tenant isolation.
+- Concurrent calls for two tenant fixtures with no cross-tenant calls, knowledge, appointments, or workflow jobs.
 - Idempotent preflight and finalization.
 - Tenant-scoped information lookup.
 - Availability, booking, duplicate booking, reschedule, and cancellation.
@@ -240,21 +287,27 @@ Test-only Hampton Travel identifiers are supplied via environment variables or d
 - Search requests are debounced.
 - Refresh errors show stale-state messaging without destroying data.
 
-### Workflow and live tests
+### Local n8n, workflow, and live tests
 
 1. Validate all workflow JSON with `jq` and import validation.
-2. Run the corrected Postman collection against a non-production database and n8n webhook endpoints.
-3. Confirm the Hampton Travel tenant maps to the selected Retell number and agent.
-4. Register the backend inbound and event webhook URLs and add the Retell tools while preserving the prompt.
-5. Call the Hampton Travel number from a real phone.
-6. Ask a known business-information question.
-7. Ask for availability and book a future appointment.
-8. End the call and wait for `call_analyzed`.
-9. Confirm one call log, one appointment, correct tenant ownership, transcript/analysis, usage update, and n8n notification execution.
-10. Repeat the same delivery payload synthetically and confirm no duplicate rows or notifications.
+2. Start local n8n with isolated task-owned state and import all corrected workflows.
+3. Run the corrected Postman collection against a non-production database and local n8n webhook endpoints.
+4. Run the same action set for at least two tenant fixtures and prove their results remain isolated.
+5. Confirm the Hampton Travel fixture maps to the selected Retell number and agent through the generic resolver.
+6. Expose the local backend through a temporary HTTPS tunnel for Retell; n8n stays local unless a workflow must receive a Retell-reachable callback during this test.
+7. Register the temporary backend inbound and event webhook URLs and add the Retell tools while preserving the prompt.
+8. Call the Hampton Travel number from a real phone.
+9. Ask a known Hampton Travel business-information question.
+10. Ask for availability and book a future appointment.
+11. End the call and wait for `call_analyzed`.
+12. Confirm one call log, one appointment, correct tenant ownership, transcript/analysis, usage update, and local n8n notification execution.
+13. Repeat the same delivery payload synthetically and confirm no duplicate rows or notifications.
+14. Export the validated local workflows, import them into n8n Cloud, configure cloud credentials/variables, and run synthetic cloud smoke tests.
+15. Replace temporary Retell webhook/tool URLs with the production backend HTTPS URLs only after the cloud smoke tests pass.
 
 ## Acceptance Criteria
 
+- Calling any configured business number resolves its own tenant and agent through data, with no application-code change per business.
 - Calling the selected Hampton Travel number connects to the Hampton Travel agent and not another tenant's agent.
 - The agent answers from Hampton Travel's preserved prompt and tenant-scoped knowledge.
 - The caller can check availability and create a future booking during the same live call.
@@ -262,12 +315,13 @@ Test-only Hampton Travel identifiers are supplied via environment variables or d
 - A booking appears in the Hampton Travel dashboard within 15 seconds of the backend commit.
 - The completed call appears in Call Logs within 15 seconds of Retell's event delivery and is enriched after analysis without duplication.
 - Usage is incremented once and concurrency is released once per call.
-- n8n receives the applicable notification/orchestration jobs without direct database access.
+- Local n8n receives and passes all applicable notification/orchestration tests before the workflows are imported into n8n Cloud.
+- n8n receives an explicit tenant context on every execution and never uses a static/default business.
 - Invalid signatures, unknown numbers, cross-tenant appointment IDs, and replayed side effects are rejected safely.
 - No existing Hampton Travel prompt content or unrelated repository changes are lost.
 
 ## Rollout and Rollback
 
-Roll out to the single Hampton Travel number first. Keep a redacted backup of the current Retell phone, agent, and LLM configuration before mutation. After automated and synthetic tests pass, update the Hampton phone inbound webhook, agent event webhook, and LLM tools. Do not update the other six numbers during the first release.
+The implementation is multi-tenant from its first commit, but external rollout is canary-based. Keep a redacted backup of the current Retell phone, agent, and LLM configuration before mutation. After automated, two-tenant isolation, local n8n, and synthetic tests pass, update the Hampton Travel phone inbound webhook, agent event webhook, and LLM tools as the first canary. Do not update the other six current numbers until the Hampton real-call test and n8n Cloud smoke tests pass. Subsequent businesses use the same provisioning/synchronization path without source-code changes.
 
 Rollback restores the saved Retell phone/agent/LLM configuration, disables the new webhook routes from Retell, and deactivates the corrected n8n workflows. Database migrations must be additive; stored call and appointment records remain readable by the previous dashboard.
