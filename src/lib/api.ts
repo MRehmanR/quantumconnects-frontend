@@ -579,7 +579,12 @@ export const featureTogglesApi = {
     request<FeatureToggleConfig>("/api/feature-toggles", { method: "PUT", body: JSON.stringify(config) }),
 };
 
+export type ReceptionistVoice = {
+  id: string; label: string; gender: string; accent: string; provider: string; previewUrl: string | null;
+};
+
 export const aiReceptionistApi = {
+  getVoices: () => request<ReceptionistVoice[]>("/api/ai-receptionist/voices"),
   getConfig: () => request<AiReceptionistConfigData>("/api/ai-receptionist/config"),
   updateConfig: (payload: Partial<AiReceptionistConfigData>) =>
     request<AiReceptionistConfigData>("/api/ai-receptionist/config", {

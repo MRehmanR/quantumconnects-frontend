@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import {
   Bot, Building2, CalendarDays, ChevronRight, Clock3, Info, Plus, Save, Trash2,
 } from "lucide-react";
+import VoicePicker from "@/components/receptionist/VoicePicker";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ import {
   type FeatureToggleConfig,
   type KnowledgeBaseItem,
   type ProfileData,
+  type ReceptionistVoice,
 } from "@/lib/api";
 
 type TabKey = "overview" | "setup" | "faqs" | "training" | "booking";
@@ -64,17 +66,6 @@ const defaultFaqs = [
   { title: "Where are you located?", content: "We are located in central London. Full address is shared in your booking confirmation." },
 ];
 
-const VOICE_OPTIONS = [
-  { id: "Aria", label: "Aria", gender: "Female" },
-  { id: "Sophie", label: "Sophie", gender: "Female" },
-  { id: "Emma", label: "Emma", gender: "Female" },
-  { id: "Grace", label: "Grace", gender: "Female" },
-  { id: "James", label: "James", gender: "Male" },
-  { id: "Oliver", label: "Oliver", gender: "Male" },
-  { id: "Marcus", label: "Marcus", gender: "Male" },
-  { id: "Ethan", label: "Ethan", gender: "Male" },
-];
-
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (value: boolean) => void }) {
   return (
     <label className="relative inline-flex cursor-pointer">
@@ -98,39 +89,16 @@ export default function KnowledgeBase() {
 
   const [newTraining, setNewTraining] = useState({ title: "", content: "" });
   const [newFaq, setNewFaq] = useState({ question: "", answer: "" });
-  const [playingVoice, setPlayingVoice] = useState<string | null>(null);
-
-  const playVoiceSample = (voiceId: string, label: string) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      return;
-    }
-
-    try {
-      const synth = window.speechSynthesis;
-      const utter = new SpeechSynthesisUtterance(`Hello, this is ${label}. How can I help you today?`);
-
-      const setVoiceAndSpeak = () => {
-        const voices = synth.getVoices() || [];
-        const found = voices.find((v) => (v.name || '').toLowerCase().includes(label.toLowerCase()) || (v.name || '').toLowerCase().includes(voiceId.toLowerCase()));
-        if (found) {
-          // @ts-ignore
-          utter.voice = found;
-        }
-        setPlayingVoice(voiceId);
-        utter.onend = () => setPlayingVoice(null);
-        synth.cancel();
-        synth.speak(utter);
-      };
-
-      if (synth.getVoices().length === 0) {
-        synth.onvoiceschanged = () => setVoiceAndSpeak();
-      } else {
-        setVoiceAndSpeak();
-      }
-    } catch (err) {
-      // ignore
-    }
-  };
+  const [voices, setVoices] = useState<ReceptionistVoice[]>([]);
+  const [voiceError, setVoiceError] = useState("");
+  const [voicesLoading, setVoicesLoading] = useState(true);
+  useEffect(() => {
+    let active = true;
+    aiReceptionistApi.getVoices().then(data => { if (active) setVoices(data); })
+      .catch(() => { if (active) setVoiceError("Could not load actor voices. Please refresh to try again."); })
+      .finally(() => { if (active) setVoicesLoading(false); });
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     const run = async () => {
@@ -328,7 +296,7 @@ export default function KnowledgeBase() {
                 <div>
                   <p className="text-xl sm:text-2xl font-semibold text-foreground">{config.name}</p>
                   <p className="text-muted-foreground">
-                    AI Receptionist - Voice: {VOICE_OPTIONS.find((voice) => voice.id === config.voice)?.label || config.voice}
+                    AI Receptionist - Voice: {voices.find((voice) => voice.id === config.voice)?.label || config.voice}
                   </p>
                   <span className="mt-1 inline-flex rounded-full bg-amber-500/20 text-amber-500 px-3 py-1 text-xs font-semibold">live demo</span>
                 </div>
@@ -441,27 +409,11 @@ export default function KnowledgeBase() {
             <div className="card-surface p-5 space-y-4">
               <h3 className="text-lg font-semibold text-foreground flex items-center gap-2"><Bot className="h-5 w-5 text-primary" /> AI Receptionist Name & Voice</h3>
               <div><Label className="text-xs uppercase tracking-wider mb-1.5 block">Receptionist Name</Label><Input className="max-w-xs" value={config.name} onChange={(e) => setConfig((prev) => ({ ...prev, name: e.target.value }))} /></div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-                {VOICE_OPTIONS.map((voice) => (
-                  <div key={voice.id} className={`rounded-xl border p-3 text-left ${config.voice === voice.id ? "border-primary bg-primary/15" : "border-border"}`}>
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1" onClick={() => setConfig((prev) => ({ ...prev, voice: voice.id }))}>
-                        <p className="font-semibold text-foreground">{voice.label}</p>
-                        <p className="text-xs text-muted-foreground">{voice.gender} voice</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          className="text-sm text-muted-foreground hover:text-foreground"
-                          onClick={() => playVoiceSample(voice.id, voice.label)}
-                          aria-label={`Play sample for ${voice.label}`}
-                        >
-                          {playingVoice === voice.id ? 'Playing...' : 'Play'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {voicesLoading && <p role="status" className="text-sm text-muted-foreground">Loading actor voices...</p>}
+              {voiceError && <p role="alert" className="text-sm text-destructive">{voiceError}</p>}
+              {!voicesLoading && !voiceError && voices.length === 0 && <p className="text-sm text-muted-foreground">No actor voices are available.</p>}
+              {!voicesLoading && voices.length > 0 && !voices.some(voice => voice.id === config.voice) && <p className="text-sm text-muted-foreground">Choose an actor below to replace the previous voice selection.</p>}
+              <VoicePicker voices={voices} value={config.voice} onChange={voice => setConfig(prev => ({ ...prev, voice }))} />
               <div><Label className="text-xs uppercase tracking-wider mb-1.5 block">Custom Greeting</Label><Textarea rows={4} value={config.customGreeting} onChange={(e) => setConfig((prev) => ({ ...prev, customGreeting: e.target.value }))} /></div>
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button variant="outline" onClick={() => setShowScheduleModal(true)}><Clock3 className="h-4 w-4 mr-1" /> Open Agent Schedule</Button>
